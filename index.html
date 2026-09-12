@@ -115,24 +115,31 @@
                 <!-- الصفحة الرئيسية -->
                 <div class="page active" id="page-home">
                     <!-- القسم الترويجي (Banner) -->
-                    <section class="hero" id="hero">
-                        <div class="hero-blob1"></div><div class="hero-blob2"></div>
-                        <span class="hero-kicker"><i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="hero_kicker">La plateforme d'apprentissage tunisienne</span></span>
-                        <h1><span data-i18n="hero_t1">Apprends quelque chose de</span> <span class="grad" data-i18n="hero_t2">nouveau chaque jour</span><br><span class="ar" data-i18n="hero_t3">بالدارجة التونسية</span></h1>
-                        <p data-i18n="hero_p">Des cours gratuits en programmation, design, langues et marketing — sélectionnés pour la communauté tunisienne.</p>
-                        <div class="hero-cta">
-                            <button class="hero-btn primary" onclick="scrollToGrid()"><i class="fa-solid fa-play"></i> <span data-i18n="hero_cta">Commencer</span></button>
-                            <button class="hero-btn ghost" onclick="navigate('settings')"><i class="fa-solid fa-sliders"></i> <span data-i18n="hero_pref">Préférences</span></button>
-                        </div>
-                        <div class="hero-stats">
-                            <div class="hstat"><b id="statV">0</b><span data-i18n="courses">cours</span></div>
-                            <div class="hstat"><b id="statC">5</b><span data-i18n="cats">Catégories</span></div>
-                            <div class="hstat"><b><i>100%</i></b><span data-i18n="free">gratuit</span></div>
-                            <div class="hstat"><b id="statH">0h</b><span data-i18n="content">heures de contenu</span></div>
-                        </div>
-                    </section>
-
-                    <div class="marquee-wrap" id="marqueeWrap"><div class="marquee" id="marquee"></div></div>
+                    <!-- القسم الترويجي بالدارجة التونسية -->
+<section class="hero" id="hero">
+    <div class="hero-blob1"></div><div class="hero-blob2"></div>
+    <span class="hero-kicker"><i class="fa-solid fa-wand-magic-sparkles"></i> المنصة الأولى للتعليم في تونس</span>
+    
+    <h1>تعلّم حاجة <span class="grad">جديدة كل يوم</span><br><span class="ar">بالدارجة التونسية 🇹🇳</span></h1>
+    
+    <p>كورسات بلاش في البرمجة، التصميم، اللغات والتسويق — ملمومين ومختارين خصيصا ليك باش تطور من روحك.</p>
+    
+    <div class="hero-cta">
+        <button class="hero-btn primary" onclick="document.getElementById('grid').scrollIntoView({behavior: 'smooth'})">
+            <i class="fa-solid fa-play"></i> ابدا تقرا توّا
+        </button>
+        <button class="hero-btn ghost" onclick="navigate('settings')">
+            <i class="fa-solid fa-sliders"></i> الإعدادات
+        </button>
+    </div>
+    
+    <div class="hero-stats">
+        <div class="hstat"><b id="statV">0</b><span>دورة</span></div>
+        <div class="hstat"><b id="statC">0</b><span>تصنيفات</span></div>
+        <div class="hstat"><b><i>100%</i></b><span>بلاش</span></div>
+        <div class="hstat"><b id="statH">0h</b><span>ساعات قراية</span></div>
+    </div>
+</section>
                     
                     <!-- فلاتر يوتيوب -->
                     <div class="filter-bar" id="filterBar"></div>
