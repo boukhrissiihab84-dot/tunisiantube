@@ -25,68 +25,57 @@ const CAT_ICONS = {
 };
 
 // =====================
-// BUILD SIDEBAR (YouTube)
+// BUILD SIDEBAR (منظم وعمودي 100%)
 // =====================
 function buildSide() {
     const cats = {}, subs = {};
-    allVideos.forEach(v => {
-        cats[v.category] = (cats[v.category] || 0) + 1;
-        if (v.topic !== "Général") subs[v.topic] = (subs[v.topic] || 0) + 1;
+    allVideos.forEach(v => { 
+        cats[v.category] = (cats[v.category] || 0) + 1; 
+        if (v.topic && v.topic !== "Général") subs[v.topic] = (subs[v.topic] || 0) + 1; 
     });
 
     const cl = document.getElementById("catList");
     if (cl) {
         cl.innerHTML = `
-            <div class="yt-side-section">
-                <button class="yt-side-btn active" onclick="showAll()">
-                    ${YT_ICONS.home}<span>الرئيسية</span>
-                </button>
-                <button class="yt-side-btn" onclick="navigate('trending')">
-                    ${YT_ICONS.trending}<span>الرائج 🔥</span>
-                </button>
-                <button class="yt-side-btn" onclick="navigate('subscriptions')">
-                    ${YT_ICONS.subs}<span>الاشتراكات</span>
-                </button>
-            </div>
-            <div class="yt-side-divider"></div>
-            <div class="yt-side-section">
-                <h3 class="yt-side-heading">🇹🇳 دورات تونسية</h3>
-                <button class="yt-side-btn" onclick="navigate('library')">
-                    ${YT_ICONS.library}<span>المكتبة</span>
-                </button>
-                <button class="yt-side-btn" onclick="navigate('history')">
-                    ${YT_ICONS.history}<span>السجل</span>
-                </button>
-                <button class="yt-side-btn" onclick="navigate('liked')">
-                    ${YT_ICONS.liked}<span>إعجابات</span>
-                </button>
-            </div>
-            <div class="yt-side-divider"></div>
-            <div class="yt-side-section">
-                <h3 class="yt-side-heading">التصنيفات</h3>
+            <button class="side-btn active" onclick="showAll()">
+                <i class="fa-solid fa-house"></i>
+                <span class="side-txt">الرئيسية</span>
+                <span class="side-cnt">${allVideos.length}</span>
+            </button>
+            <div class="side-divider"></div>
         `;
         Object.entries(cats).sort((a, b) => b[1] - a[1]).forEach(([c, n]) => {
             cl.innerHTML += `
-                <button class="yt-side-btn" onclick="navigate('category','${c}')">
-                    ${CAT_ICONS[c] || CAT_ICONS.Autre}<span>${c}</span>
-                    <span class="yt-side-count">${n}</span>
-                </button>`;
+            <button class="side-btn" onclick="navigate('category','${c}')">
+                <i class="fa-solid fa-folder"></i>
+                <span class="side-txt">${c}</span>
+                <span class="side-cnt">${n}</span>
+            </button>`;
         });
-        cl.innerHTML += `</div>`;
     }
 
     const sl = document.getElementById("subList");
     if (sl) {
-        sl.innerHTML = `<div class="yt-side-divider"></div><div class="yt-side-section"><h3 class="yt-side-heading">المواضيع</h3>`;
+        sl.innerHTML = "";
         Object.entries(subs).sort((a, b) => b[1] - a[1]).slice(0, 15).forEach(([s, n]) => {
             sl.innerHTML += `
-                <button class="yt-side-btn yt-side-sub" onclick="filterSubHome('${s}')">
-                    <span class="yt-side-dot"></span><span>${s}</span>
-                    <span class="yt-side-count">${n}</span>
-                </button>`;
+            <button class="side-btn" onclick="filterSubHome('${s}')">
+                <i class="fa-solid fa-hashtag"></i>
+                <span class="side-txt">${s}</span>
+                <span class="side-cnt">${n}</span>
+            </button>`;
         });
-        sl.innerHTML += `</div>`;
     }
+
+    // تحديث إحصائيات الصفحة الرئيسية (Hero Stats)
+    updateStats(cats);
+}
+
+function updateStats(cats) {
+    if (document.getElementById("statV")) document.getElementById("statV").textContent = allVideos.length;
+    if (document.getElementById("vCount")) document.getElementById("vCount").textContent = allVideos.length + " دورة";
+    if (document.getElementById("statC")) document.getElementById("statC").textContent = Object.keys(cats).length;
+    if (document.getElementById("statH")) document.getElementById("statH").textContent = "+1500h";
 }
 
 // =====================
