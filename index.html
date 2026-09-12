@@ -34,7 +34,12 @@
     <link rel="stylesheet" href="misc.css">
     <link rel="stylesheet" href="responsive.css">
 </head>
-<body class="yt-dark-theme">
+<script>
+    // فرض الـ Dark Mode افتراضياً، وتغييره كان المستخدم طلب Light
+    const saved = JSON.parse(localStorage.getItem("tt_settings") || "{}");
+    const theme = saved.theme || "dark";
+    document.documentElement.setAttribute("data-theme", theme);
+</script>
 
     <div class="app-container">
         
