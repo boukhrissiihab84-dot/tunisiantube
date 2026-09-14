@@ -1,544 +1,315 @@
-// =====================================================================
-// UI.JS - محرك الواجهة والشبكة (TunisianTube 🇹🇳)
-// =====================================================================
-
-(function() {
-    'use strict';
-
-    // =================================================================
-    // إعدادات ومتغيرات
-    // =================================================================
-    
-    // BATCH_SIZE للتحميل التدريجي (إذا مش معرف في globals.js)
-    if (typeof window.BATCH_SIZE === 'undefined') {
-        window.BATCH_SIZE = 24;
-    }
-
-    // متغيرات global (إذا مش معرفين في globals.js)
-    if (typeof window.activeList === 'undefined') window.activeList = [];
-    if (typeof window.displayedCount === 'undefined') window.displayedCount = 0;
-    if (typeof window.currentFilter === 'undefined') window.currentFilter = { cat: null, sub: null, search: '' };
-    if (typeof window.searchTimer === 'undefined') window.searchTimer = null;
-    if (typeof window.observer === 'undefined') window.observer = null;
-
-    // خريطة أيقونات التصنيفات
-    const CAT_FA_ICONS = {
-        "Design": "fa-palette",
-        "Programmation": "fa-code",
-        "Langues": "fa-language",
-        "Marketing": "fa-chart-line",
-        "Montage": "fa-clapperboard",
-        "Freelance": "fa-briefcase",
-        "Bac & Etudes": "fa-graduation-cap",
-        "Bureautique": "fa-file-excel",
-        "Autre": "fa-box"
-    };
-
-    // =================================================================
-    // 1. أدوات مساعدة (Helpers)
-    // =================================================================
-
-    // Escape للـ HTML (يحمي من XSS)
-    function escHTML(s) {
-        if (s === null || s === undefined) return '';
-        return String(s)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
-
-    // Escape للـ JavaScript strings (للـ onclick attributes)
-    function escStr(s) {
-        if (s === null || s === undefined) return '';
-        return String(s)
-            .replace(/\\/g, '\\\\')
-            .replace(/'/g, "\\'")
-            .replace(/"/g, '\\"')
-            .replace(/\n/g, '\\n')
-            .replace(/\r/g, '\\r');
-    }
-
-    // نشر الدوال في window باش تنجم تستعملها من HTML
-    window.escStr = escStr;
-    window.escHTML = escHTML;
-
-    // جلب قائمة الفيديوهات من أي مصدر متوفر
-    function getVideosList() {
-        if (typeof window.allVideos !== 'undefined' && Array.isArray(window.allVideos) && window.allVideos.length > 0) {
-            return window.allVideos;
-        }
-        if (typeof window.rawVideosData !== 'undefined' && Array.isArray(window.rawVideosData) && window.rawVideosData.length > 0) {
-            return window.rawVideosData;
-        }
-        return [];
-    }
-    window.getVideosList = getVideosList;
-
-    // =================================================================
-    // 2. بناء القائمة الجانبية (Sidebar)
-    // =================================================================
-    window.buildSide = function() {
-        const vids = getVideosList();
-        const cats = {};
-        const subs = {};
-
-        // تجميع التصنيفات والمواضيع
-        vids.forEach(function(v) {
-            if (!v) return;
-            const c = v.category || 'Autre';
-            cats[c] = (cats[c] || 0) + 1;
-            const t = v.topic || '';
-            if (t && t !== 'Général') {
-                subs[t] = (subs[t] || 0) + 1;
-            }
-        });
-
-        // بناء قائمة التصنيفات
-        const cl = document.getElementById('catList');
-        if (cl) {
-            let html = '<h4>الرئيسية</h4>';
-            html += '<button class="side-btn active" onclick="showAll()" data-view="home">'
-                 + '<i class="fa-solid fa-house" aria-hidden="true"></i>'
-                 + '<span class="side-txt">الرئيسية</span>'
-                 + '<span class="side-cnt">' + vids.length + '</span>'
-                 + '</button>';
-
-            html += '<h4>التصنيفات</h4>';
-            Object.entries(cats)
-                .sort(function(a, b) { return b[1] - a[1]; })
-                .forEach(function(entry) {
-                    const c = entry[0];
-                    const n = entry[1];
-                    const icon = CAT_FA_ICONS[c] || 'fa-folder';
-                    html += '<button class="side-btn" onclick="filterChipHome(\'' + escStr(c) + '\', event)" data-cat="' + escHTML(c) + '">'
-                         + '<i class="fa-solid ' + icon + '" aria-hidden="true"></i>'
-                         + '<span class="side-txt">' + escHTML(c) + '</span>'
-                         + '<span class="side-cnt">' + n + '</span>'
-                         + '</button>';
-                });
-            cl.innerHTML = html;
-        }
-
-        // بناء قائمة المواضيع الفرعية
-        const sl = document.getElementById('subList');
-        if (sl) {
-            let html2 = '<h4>المواضيع الأكثر طلباً 🔥</h4>';
-            Object.entries(subs)
-                .sort(function(a, b) { return b[1] - a[1]; })
-                .slice(0, 15)
-                .forEach(function(entry) {
-                    const t = entry[0];
-                    const n = entry[1];
-                    html2 += '<button class="side-btn" onclick="filterSubHome(\'' + escStr(t) + '\', event)" data-sub="' + escHTML(t) + '">'
-                          + '<i class="fa-solid fa-hashtag" aria-hidden="true"></i>'
-                          + '<span class="side-txt">' + escHTML(t) + '</span>'
-                          + '<span class="side-cnt">' + n + '</span>'
-                          + '</button>';
-                });
-            sl.innerHTML = html2;
-        }
-
-        updateHeroStats(vids, cats);
-    };
-
-    // تحديث إحصائيات الـ Hero
-    function updateHeroStats(vids, cats) {
-        const totalVids = vids.length || 5007;
-        const catCount = Object.keys(cats).length || 8;
-
-        setText('statV', totalVids);
-        setText('vCount', totalVids + ' دورة');
-        setText('statC', catCount);
-        setText('statH', '+1500h');
-    }
-
-    function setText(id, val) {
-        const el = document.getElementById(id);
-        if (el) el.textContent = val;
-    }
-
-    // =================================================================
-    // 3. بناء شريط الفلاتر (YouTube Chips)
-    // =================================================================
-    window.buildChips = function() {
-        const fb = document.getElementById('filterBar');
-        if (!fb) return;
-
-        const vids = getVideosList();
-        const categoriesSet = {};
-        vids.forEach(function(v) {
-            if (v && v.category) categoriesSet[v.category] = true;
-        });
-        const categories = Object.keys(categoriesSet);
-
-        let html = '<button class="chip active" onclick="showAll(event)">الكل</button>';
-        categories.forEach(function(c) {
-            html += '<button class="chip" onclick="filterChipHome(\'' + escStr(c) + '\', event)">' + escHTML(c) + '</button>';
-        });
-        fb.innerHTML = html;
-    };
-
-    // =================================================================
-    // 4. كارت الفيديو (YouTube Design)
-    // =================================================================
-    function ytCardHTML(v) {
-        if (!v || !v.id) return '';
-
-        const thumb = v.thumb || 'https://img.youtube.com/vi/' + encodeURIComponent(v.id) + '/hqdefault.jpg';
-        const fallback = 'https://img.youtube.com/vi/' + encodeURIComponent(v.id) + '/hqdefault.jpg';
-        const dur = v.duration ? '<span class="dur">' + escHTML(v.duration) + '</span>' : '';
-        const catBadge = v.category ? '<span class="cat-chip">' + escHTML(v.category) + '</span>' : '';
-        const views = v.views ? formatViews(v.views) + ' مشاهدة' : (v.category || 'دورة تونسية');
-        const time = v.date ? ' • ' + timeAgo(v.date) : '';
-        const title = escHTML(v.title || 'دورة تعليمية');
-        const channel = escHTML(v.channel || 'TunisianTube');
-        const topic = escHTML(v.topic || v.category || '');
-
-        return '<div class="card" onclick="navigate(\'video\', {id: \'' + escStr(v.id) + '\'})" role="button" tabindex="0" aria-label="' + title + '">'
-             +   '<div class="thumb">'
-             +     '<img src="' + escHTML(thumb) + '" alt="' + title + '" loading="lazy" onerror="if(this.src!==\'' + escStr(fallback) + '\'){this.src=\'' + escStr(fallback) + '\';}">'
-             +     dur
-             +     catBadge
-             +     '<div class="thumb-play"><span><i class="fa-solid fa-play" aria-hidden="true"></i></span></div>'
-             +   '</div>'
-             +   '<div class="card-body">'
-             +     '<div class="card-info">'
-             +       '<div class="card-title">' + title + '</div>'
-             +       '<div class="card-ch"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> ' + channel + '</div>'
-             +       '<div class="card-meta">' + escHTML(views) + escHTML(time) + '</div>'
-             +       (topic ? '<span class="card-topic">🇹🇳 ' + topic + '</span>' : '')
-             +     '</div>'
-             +   '</div>'
-             + '</div>';
-    }
-    window.ytCardHTML = ytCardHTML;
-
-    // =================================================================
-    // 5. محرك العرض والتحميل اللانهائي
-    // =================================================================
-    window.renderHome = function() {
-        applyFilters();
-    };
-
-    function setListAndRender(list) {
-        window.activeList = list || [];
-        window.displayedCount = 0;
-
-        const g = document.getElementById('grid');
-        const e = document.getElementById('empty');
-
-        if (g) g.innerHTML = '';
-
-        if (!window.activeList.length) {
-            if (e) {
-                e.style.display = 'block';
-                e.innerHTML = '<div class="e-i"><i class="fa-solid fa-face-sad-tear" aria-hidden="true"></i></div>'
-                           + '<h2>ما فما حتى فيديو 🇹🇳</h2>'
-                           + '<p>بدل الفلتر ولا لوج بكلمة أخرى</p>';
-            }
-            return;
-        }
-
-        if (e) e.style.display = 'none';
-
-        setupInfiniteScroll();
-        renderNextBatch();
-    }
-    window.setListAndRender = setListAndRender;
-
-    function setupInfiniteScroll() {
-        if (window.observer) {
-            try { window.observer.disconnect(); } catch(e) {}
-        }
-
-        const sentinel = document.getElementById('sentinel');
-        if (!sentinel) return;
-
-        // Fallback إذا IntersectionObserver غير مدعوم
-        if (typeof IntersectionObserver === 'undefined') {
-            window.addEventListener('scroll', throttle(function() {
-                const rect = sentinel.getBoundingClientRect();
-                if (rect.top < window.innerHeight + 400) renderNextBatch();
-            }, 200));
-            return;
-        }
-
-        window.observer = new IntersectionObserver(function(entries) {
-            if (entries[0].isIntersecting) renderNextBatch();
-        }, { rootMargin: '400px' });
-
-        window.observer.observe(sentinel);
-    }
-
-    function renderNextBatch() {
-        const g = document.getElementById('grid');
-        if (!g) return;
-
-        const batch = window.activeList.slice(window.displayedCount, window.displayedCount + window.BATCH_SIZE);
-        if (!batch.length) return;
-
-        window.displayedCount += batch.length;
-        
-        const htmlParts = [];
-        for (let i = 0; i < batch.length; i++) {
-            htmlParts.push(ytCardHTML(batch[i]));
-        }
-        g.insertAdjacentHTML('beforeend', htmlParts.join(''));
-    }
-    window.renderNextBatch = renderNextBatch;
-
-    // Throttle للـ scroll fallback
-    function throttle(fn, wait) {
-        let last = 0;
-        return function() {
-            const now = Date.now();
-            if (now - last >= wait) {
-                last = now;
-                fn.apply(this, arguments);
-            }
-        };
-    }
-
-    // =================================================================
-    // 6. الفلاتر والبحث
-    // =================================================================
-    window.showAll = function(evt) {
-        window.currentFilter = { cat: null, sub: null, search: '' };
-        
-        const si = document.getElementById('searchInput');
-        if (si) si.value = '';
-
-        // إزالة النشاط من كل الأزرار
-        document.querySelectorAll('.side-btn, .chip').forEach(function(b) {
-            b.classList.remove('active');
-        });
-
-        // تفعيل زر "الكل" في الـ chips
-        const firstChip = document.querySelector('#filterBar .chip');
-        if (firstChip) firstChip.classList.add('active');
-
-        // تفعيل زر "الرئيسية" في الـ sidebar
-        const homeBtn = document.querySelector('[data-view="home"]');
-        if (homeBtn) homeBtn.classList.add('active');
-
-        if (typeof navigate === 'function') navigate('home');
-        else applyFilters();
-    };
-
-    window.filterChipHome = function(c, evt) {
-        window.currentFilter.cat = c;
-        window.currentFilter.sub = null;
-
-        // إزالة النشاط من الـ chips
-        document.querySelectorAll('.chip').forEach(function(b) {
-            b.classList.remove('active');
-        });
-
-        // تفعيل الزر المضغوط
-        if (evt && evt.target) {
-            const btn = evt.target.closest('.chip, .side-btn');
-            if (btn) btn.classList.add('active');
-        }
-
-        if (typeof navigate === 'function') navigate('home');
-        else applyFilters();
-    };
-
-    window.filterSubHome = function(s, evt) {
-        window.currentFilter.sub = s;
-
-        document.querySelectorAll('#subList .side-btn').forEach(function(b) {
-            b.classList.remove('active');
-        });
-
-        if (evt && evt.target) {
-            const btn = evt.target.closest('.side-btn');
-            if (btn) btn.classList.add('active');
-        }
-
-        if (typeof navigate === 'function') navigate('home');
-        else applyFilters();
-    };
-
-    window.onSearchInput = function() {
-        clearTimeout(window.searchTimer);
-        window.searchTimer = setTimeout(function() {
-            const si = document.getElementById('searchInput');
-            window.currentFilter.search = (si ? si.value : '').toLowerCase().trim();
-            
-            if (typeof navigate === 'function') navigate('home');
-            else applyFilters();
-        }, 300);
-    };
-
-    function applyFilters() {
-        let r = getVideosList();
-
-        if (window.currentFilter.cat) {
-            r = r.filter(function(v) { return v && v.category === window.currentFilter.cat; });
-        }
-
-        if (window.currentFilter.sub) {
-            r = r.filter(function(v) { return v && v.topic === window.currentFilter.sub; });
-        }
-
-        if (window.currentFilter.search) {
-            const q = window.currentFilter.search;
-            r = r.filter(function(v) {
-                if (!v) return false;
-                const haystack = ((v.title || '') + ' ' + (v.channel || '') + ' ' + (v.topic || '') + ' ' + (v.category || '')).toLowerCase();
-                return haystack.includes(q);
-            });
-        }
-
-        setListAndRender(r);
-    }
-    window.applyFilters = applyFilters;
-
-    // =================================================================
-    // 7. تحميل الصفحات الجانبية
-    // =================================================================
-    window.loadCategoryPage = function(cat) {
-        const ci = document.getElementById('catIcon');
-        if (ci) {
-            ci.innerHTML = '<i class="fa-solid ' + (CAT_FA_ICONS[cat] || 'fa-folder') + '" aria-hidden="true"></i>';
-        }
-
-        const ct = document.getElementById('catTitle');
-        if (ct) ct.textContent = cat;
-
-        const cs = document.getElementById('catSub');
-        const filtered = getVideosList().filter(function(v) { return v && v.category === cat; });
-        
-        if (cs) cs.textContent = filtered.length + ' دورة بالدارجة 🇹🇳';
-
-        const cg = document.getElementById('categoryGrid');
-        if (cg) {
-            if (!filtered.length) {
-                cg.innerHTML = '<div class="empty-state" style="grid-column:1/-1;text-align:center;padding:60px;">'
-                            + '<h2>فارغة 😅</h2><p>ما فما دورات في هذا التصنيف توّا</p></div>';
-            } else {
-                cg.innerHTML = filtered.map(ytCardHTML).join('');
-            }
-        }
-    };
-
-    function renderGridPage(gid, list) {
-        const g = document.getElementById(gid);
-        if (!g) return;
-
-        if (!list || !list.length) {
-            g.innerHTML = '<div class="empty-state" style="grid-column:1/-1;text-align:center;padding:60px;">'
-                       + '<div class="e-i"><i class="fa-solid fa-inbox" aria-hidden="true" style="font-size:48px;opacity:0.3;"></i></div>'
-                       + '<h2>فارغة 😅</h2>'
-                       + '<p>ما فما شيء لهنا توّا</p></div>';
-            return;
-        }
-        g.innerHTML = list.map(ytCardHTML).join('');
-    }
-    window.renderGridPage = renderGridPage;
-
-    window.loadLikedPage = function() {
-        try {
-            const likes = JSON.parse(localStorage.getItem('tt_likes') || '{}');
-            const ids = Object.keys(likes).filter(function(k) { return likes[k]; });
-            const filtered = getVideosList().filter(function(v) { return v && ids.includes(v.id); });
-            renderGridPage('likedGrid', filtered);
-        } catch(e) {
-            console.warn('⚠️ loadLikedPage:', e.message);
-            renderGridPage('likedGrid', []);
-        }
-    };
-
-    window.loadSubscriptionsPage = function() {
-        try {
-            const subs = JSON.parse(localStorage.getItem('tt_subs') || '{}');
-            const channels = Object.keys(subs).filter(function(k) { return subs[k]; });
-            const filtered = getVideosList().filter(function(v) { return v && channels.includes(v.channel); });
-            renderGridPage('subsGrid', filtered);
-        } catch(e) {
-            console.warn('⚠️ loadSubscriptionsPage:', e.message);
-            renderGridPage('subsGrid', []);
-        }
-    };
-
-    window.loadHistoryPage = function() {
-        try {
-            const h = JSON.parse(localStorage.getItem('tt_history') || '[]');
-            const vids = getVideosList();
-            const filtered = h.map(function(id) {
-                return vids.find(function(v) { return v && v.id === id; });
-            }).filter(Boolean);
-            renderGridPage('historyGrid', filtered);
-        } catch(e) {
-            console.warn('⚠️ loadHistoryPage:', e.message);
-            renderGridPage('historyGrid', []);
-        }
-    };
-
-    // =================================================================
-    // 8. أدوات تواريخ ومشاهدات
-    // =================================================================
-    function formatViews(n) {
-        n = parseInt(n || 0, 10);
-        if (!n || isNaN(n)) return '';
-        if (n >= 1e9) return (n / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
-        if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
-        if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
-        return String(n);
-    }
-    window.formatViews = formatViews;
-
-    function timeAgo(d) {
-        if (!d) return 'جديد';
-        
-        const date = new Date(d);
-        if (isNaN(date.getTime())) return 'جديد';
-        
-        const diff = Math.floor((Date.now() - date.getTime()) / 1000);
-        
-        if (diff < 0) return 'جديد';
-        if (diff < 60) return 'توّا';
-        
-        if (diff < 3600) {
-            const m = Math.floor(diff / 60);
-            return 'قبل ' + m + ' ' + (m === 1 ? 'دقيقة' : m === 2 ? 'دقيقتين' : m < 11 ? 'دقايق' : 'دقيقة');
-        }
-        
-        if (diff < 86400) {
-            const h = Math.floor(diff / 3600);
-            return 'قبل ' + h + ' ' + (h === 1 ? 'ساعة' : h === 2 ? 'ساعتين' : h < 11 ? 'سوايع' : 'ساعة');
-        }
-        
-        if (diff < 2592000) {
-            const dd = Math.floor(diff / 86400);
-            if (dd === 1) return 'الأمس';
-            if (dd === 2) return 'قبل يومين';
-            return 'قبل ' + dd + ' ' + (dd < 11 ? 'أيام' : 'يوم');
-        }
-        
-        if (diff < 31536000) {
-            const mo = Math.floor(diff / 2592000);
-            return 'قبل ' + mo + ' ' + (mo === 1 ? 'شهر' : mo === 2 ? 'شهرين' : mo < 11 ? 'أشهر' : 'شهر');
-        }
-        
-        const y = Math.floor(diff / 31536000);
-        return 'قبل ' + y + ' ' + (y === 1 ? 'عام' : y === 2 ? 'عامين' : y < 11 ? 'سنين' : 'سنة');
-    }
-    window.timeAgo = timeAgo;
-
-    // =================================================================
-    // 9. تنظيف عند إغلاق الصفحة (منع تسريب الذاكرة)
-    // =================================================================
-    window.addEventListener('beforeunload', function() {
-        if (window.observer) {
-            try { window.observer.disconnect(); } catch(e) {}
-        }
-        if (window.searchTimer) {
-            clearTimeout(window.searchTimer);
-        }
+// ==========================================
+// 7. UI.JS - YouTube-Style UI + Touch Tounsi 🇹🇳
+// ==========================================
+
+// --- YouTube SVG Icons ---
+const YT_ICONS = {
+    home: `<svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M4 21V10.08l8-6.96 8 6.96V21h-6v-6h-4v6H4z"/></svg>`,
+    trending: `<svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M17.53 11.2c-.23-.3-.5-.56-.76-.82-.65-.6-1.4-1.03-2.03-1.66C13.3 7.26 13 5.64 13.44 4c-2.13 1.17-3.5 3.2-3.72 5.52-.04.4-.02.8.06 1.18.08.4-.04.68-.32.93-.28.24-.64.3-.97.2-.34-.1-.55-.4-.6-.74-.02-.13-.02-.26-.01-.39-.46.72-.7 1.56-.68 2.42 0 .24.03.48.08.72.3 1.3 1.23 2.38 2.44 2.94 1.2.56 2.6.5 3.74-.14 1.14-.64 1.9-1.8 2.04-3.1.14-1.3-.3-2.6-1.2-3.54z"/></svg>`,
+    subs: `<svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M10 18v-6l5 3-5 3zm7-15H7v1h10V3zm3 3H4v1h16V6zm2 3H2v12h20V9zM3 20V10h18v10H3z"/></svg>`,
+    library: `<svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/></svg>`,
+    history: `<svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M14.97 16.95L10 13.87V7h2v5.76l4.03 2.49-1.06 1.7zM22 12c0 5.51-4.49 10-10 10S2 17.51 2 12h1c0 4.96 4.04 9 9 9s9-4.04 9-9-4.04-9-9-9C8.81 3 5.92 4.64 4.28 7.38c-.11.18-.22.37-.31.56L3.94 8H8v1H2.5V3.5h1V7c.22-.39.45-.73.72-1.08C6.04 3.46 8.83 2 12 2c5.51 0 10 4.49 10 10z"/></svg>`,
+    liked: `<svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M18.77 11h-4.23l1.52-4.94C16.38 5.03 15.54 4 14.38 4c-.58 0-1.14.24-1.52.65L7 11H1v11h6l.97.97c.29.29.67.45 1.07.45h8.53c1.1 0 2.07-.72 2.38-1.78l1.72-5.77c.43-1.44-.22-2.97-1.52-3.63zM7 21H2v-9h5v9zm13.83-7.17l-1.72 5.77c-.1.35-.43.58-.8.58H9.83L14.2 5.6c.13-.14.3-.22.48-.22.39 0 .67.32.55.7l-1.8 5.86c-.1.33.02.68.3.88.14.1.3.15.47.15h4.57c.57 0 .98.55.83 1.09z"/></svg>`,
+};
+
+const CAT_ICONS = {
+    Design: `<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.04 10 9c0 3.31-2.69 6-6 6h-1.77c-.28 0-.5.22-.5.5 0 .12.05.23.13.33.41.47.64 1.06.64 1.67A2.5 2.5 0 0112 22zm0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8c.28 0 .5-.22.5-.5a.54.54 0 00-.14-.35c-.41-.46-.63-1.05-.63-1.65a2.5 2.5 0 012.5-2.5H16c2.21 0 4-1.79 4-4 0-3.86-3.59-7-8-7z"/><circle cx="6.5" cy="11.5" r="1.5"/><circle cx="9.5" cy="7.5" r="1.5"/><circle cx="14.5" cy="7.5" r="1.5"/><circle cx="17.5" cy="11.5" r="1.5"/></svg>`,
+    Programmation: `<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>`,
+    Langues: `<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>`,
+    Marketing: `<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>`,
+    Montage: `<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>`,
+    Freelance: `<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-2 .89-2 2v11c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>`,
+    "Bac & Etudes": `<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>`,
+    Bureautique: `<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z"/></svg>`,
+    Autre: `<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>`
+};
+
+// =====================
+// BUILD SIDEBAR (YouTube)
+// =====================
+function buildSide() {
+    const cats = {}, subs = {};
+    allVideos.forEach(v => {
+        cats[v.category] = (cats[v.category] || 0) + 1;
+        if (v.topic !== "Général") subs[v.topic] = (subs[v.topic] || 0) + 1;
     });
 
-})();
+    const cl = document.getElementById("catList");
+    if (cl) {
+        cl.innerHTML = `
+            <div class="yt-side-section">
+                <button class="yt-side-btn active" onclick="showAll()">
+                    ${YT_ICONS.home}<span>الرئيسية</span>
+                </button>
+                <button class="yt-side-btn" onclick="navigate('trending')">
+                    ${YT_ICONS.trending}<span>الرائج 🔥</span>
+                </button>
+                <button class="yt-side-btn" onclick="navigate('subscriptions')">
+                    ${YT_ICONS.subs}<span>الاشتراكات</span>
+                </button>
+            </div>
+            <div class="yt-side-divider"></div>
+            <div class="yt-side-section">
+                <h3 class="yt-side-heading">🇹🇳 دورات تونسية</h3>
+                <button class="yt-side-btn" onclick="navigate('library')">
+                    ${YT_ICONS.library}<span>المكتبة</span>
+                </button>
+                <button class="yt-side-btn" onclick="navigate('history')">
+                    ${YT_ICONS.history}<span>السجل</span>
+                </button>
+                <button class="yt-side-btn" onclick="navigate('liked')">
+                    ${YT_ICONS.liked}<span>إعجابات</span>
+                </button>
+            </div>
+            <div class="yt-side-divider"></div>
+            <div class="yt-side-section">
+                <h3 class="yt-side-heading">التصنيفات</h3>
+        `;
+        Object.entries(cats).sort((a, b) => b[1] - a[1]).forEach(([c, n]) => {
+            cl.innerHTML += `
+                <button class="yt-side-btn" onclick="navigate('category','${c}')">
+                    ${CAT_ICONS[c] || CAT_ICONS.Autre}<span>${c}</span>
+                    <span class="yt-side-count">${n}</span>
+                </button>`;
+        });
+        cl.innerHTML += `</div>`;
+    }
+
+    const sl = document.getElementById("subList");
+    if (sl) {
+        sl.innerHTML = `<div class="yt-side-divider"></div><div class="yt-side-section"><h3 class="yt-side-heading">المواضيع</h3>`;
+        Object.entries(subs).sort((a, b) => b[1] - a[1]).slice(0, 15).forEach(([s, n]) => {
+            sl.innerHTML += `
+                <button class="yt-side-btn yt-side-sub" onclick="filterSubHome('${s}')">
+                    <span class="yt-side-dot"></span><span>${s}</span>
+                    <span class="yt-side-count">${n}</span>
+                </button>`;
+        });
+        sl.innerHTML += `</div>`;
+    }
+}
+
+// =====================
+// BUILD CHIPS (YouTube Pills)
+// =====================
+function buildChips() {
+    const fb = document.getElementById("filterBar");
+    if (!fb) return;
+    const cats = [...new Set(allVideos.map(v => v.category))];
+    const labels = {
+        Programmation: "💻 برمجة", Design: "🎨 تصميم", Langues: "🗣️ لغات",
+        Marketing: "📈 تسويق", Montage: "🎬 مونتاج", Freelance: "💼 فريلانس",
+        "Bac & Etudes": "📚 بكالوريا", Bureautique: "📊 مكتبية"
+    };
+    fb.innerHTML = `<button class="yt-chip active" onclick="showAll()">الكل</button>`;
+    cats.forEach(c => {
+        fb.innerHTML += `<button class="yt-chip" onclick="filterChipHome('${c}')">${labels[c] || c}</button>`;
+    });
+}
+
+// =====================
+// RENDER ENGINE
+// =====================
+function renderHome() { apply(); }
+
+function setListAndRender(list) {
+    activeList = list;
+    displayedCount = 0;
+    const g = document.getElementById("grid");
+    const e = document.getElementById("empty");
+    if (g) g.innerHTML = "";
+    if (!activeList.length) {
+        if (e) {
+            e.style.display = "flex";
+            e.innerHTML = `<div class="yt-empty">
+                <svg viewBox="0 0 24 24" width="120" height="120" fill="#717171"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+                <h2>ما فما حتى فيديو 🇹🇳</h2>
+                <p>جرّب تبدّل الفلتر ولا البحث</p>
+            </div>`;
+        }
+        return;
+    }
+    if (e) e.style.display = "none";
+    setupInfiniteScroll();
+    renderNextBatch();
+}
+
+function setupInfiniteScroll() {
+    if (observer) observer.disconnect();
+    const sentinel = document.getElementById("sentinel");
+    if (!sentinel) return;
+    observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) renderNextBatch();
+    }, { rootMargin: "400px" });
+    observer.observe(sentinel);
+}
+
+// --- YouTube Card Template ---
+function ytCard(v) {
+    const views = v.views ? formatViews(v.views) + " مشاهدة" : "";
+    const time = v.date ? timeAgo(v.date) : "";
+    const meta = [views, time].filter(Boolean).join(" • ") || v.category + " • " + v.topic;
+    return `
+        <div class="yt-card" onclick="navigate('video',{id:'${v.id}'})">
+            <div class="yt-thumb-wrap">
+                <img class="yt-thumb" src="${v.thumb}" alt="${v.title}" loading="lazy"
+                     onerror="this.src='https://img.youtube.com/vi/${v.id}/hqdefault.jpg'">
+                ${v.duration ? `<span class="yt-duration">${v.duration}</span>` : ""}
+                <span class="yt-badge-tounes">🇹🇳</span>
+            </div>
+            <div class="yt-card-info">
+                <div class="yt-ch-avatar">${(v.channel || "?").charAt(0).toUpperCase()}</div>
+                <div class="yt-card-text">
+                    <h3 class="yt-card-title">${v.title}</h3>
+                    <p class="yt-card-channel">${v.channel}</p>
+                    <p class="yt-card-meta">${meta}</p>
+                </div>
+                <button class="yt-card-menu" onclick="event.stopPropagation()" aria-label="المزيد">⋮</button>
+            </div>
+        </div>`;
+}
+
+function renderNextBatch() {
+    const g = document.getElementById("grid");
+    if (!g) return;
+    const batch = activeList.slice(displayedCount, displayedCount + BATCH_SIZE);
+    if (!batch.length) return;
+    displayedCount += batch.length;
+    g.insertAdjacentHTML("beforeend", batch.map(v => ytCard(v)).join(""));
+}
+
+// =====================
+// FILTERS
+// =====================
+function showAll() {
+    currentFilter = { cat: null, sub: null, search: "" };
+    const si = document.getElementById("searchInput");
+    if (si) si.value = "";
+    document.querySelectorAll(".yt-side-btn,.yt-chip").forEach(b => b.classList.remove("active"));
+    document.querySelector(".yt-chip")?.classList.add("active");
+    document.querySelectorAll("#catList .yt-side-btn")[0]?.classList.add("active");
+    navigate("home");
+}
+
+function filterChipHome(c) {
+    currentFilter.cat = c;
+    currentFilter.sub = null;
+    document.querySelectorAll(".yt-chip").forEach(b => b.classList.remove("active"));
+    event?.target?.classList.add("active");
+    navigate("home");
+}
+
+function filterSubHome(s) {
+    currentFilter.sub = s;
+    document.querySelectorAll("#subList .yt-side-btn").forEach(b => b.classList.remove("active"));
+    event?.target?.closest(".yt-side-btn")?.classList.add("active");
+    navigate("home");
+}
+
+function onSearchInput() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        currentFilter.search = document.getElementById("searchInput").value.toLowerCase();
+        navigate("home");
+    }, 300);
+}
+
+function apply() {
+    let r = allVideos;
+    if (currentFilter.cat) r = r.filter(v => v.category === currentFilter.cat);
+    if (currentFilter.sub) r = r.filter(v => v.topic === currentFilter.sub);
+    if (currentFilter.search) r = r.filter(v =>
+        (v.title + v.channel + v.topic + v.category).toLowerCase().includes(currentFilter.search)
+    );
+    setListAndRender(r);
+}
+
+// =====================
+// PAGE LOADERS
+// =====================
+function loadCategoryPage(cat) {
+    const el = document.getElementById("catIcon");
+    if (el) el.innerHTML = CAT_ICONS[cat] || CAT_ICONS.Autre;
+    const ct = document.getElementById("catTitle");
+    if (ct) ct.textContent = cat;
+    const cg = document.getElementById("categoryGrid");
+    if (cg) cg.innerHTML = allVideos.filter(v => v.category === cat).map(v => ytCard(v)).join("");
+    applyGridSize();
+}
+
+function loadLikedPage() {
+    if (!user) { openAuth(); navigate("home"); return; }
+    const l = S.g("likes") || {};
+    const ids = Object.keys(l).filter(k => l[k].includes(user.id));
+    renderGridPage("likedGrid", allVideos.filter(v => ids.includes(v.id)), "ما عندك حتى فيديو معجب بيه");
+}
+
+function loadSubscriptionsPage() {
+    if (!user) { openAuth(); navigate("home"); return; }
+    const s = S.g("subs_" + user.id) || [];
+    renderGridPage("subsGrid", allVideos.filter(v => s.some(x => v.channel.includes(x))), "ما انت مشترك في حتى قناة");
+}
+
+function loadHistoryPage() {
+    const h = S.g("history") || [];
+    renderGridPage("historyGrid", h.map(id => allVideos.find(v => v.id === id)).filter(Boolean), "السجل فارغ");
+}
+
+function renderGridPage(gid, list, msg) {
+    const g = document.getElementById(gid);
+    if (!g) return;
+    if (!list.length) {
+        g.innerHTML = `<div class="yt-empty" style="grid-column:1/-1">
+            <svg viewBox="0 0 24 24" width="96" height="96" fill="#717171"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+            <h2>${msg}</h2></div>`;
+        return;
+    }
+    g.innerHTML = list.map(v => ytCard(v)).join("");
+    applyGridSize();
+}
+
+function toggleSidebar() {
+    const s = document.getElementById("sidebar");
+    if (!s) return;
+    
+    // على الشاشات الكبيرة: بدّل بين expanded و mini
+    if (window.innerWidth > 900) {
+        s.classList.toggle("mini");
+        document.body.classList.toggle("sidebar-mini", s.classList.contains("mini"));
+    } 
+    // على الموبايل: افتح/سكّر الـ drawer
+    else {
+        s.classList.toggle("show");
+        const bd = document.querySelector(".side-backdrop");
+        if (bd) bd.classList.toggle("show", s.classList.contains("show"));
+    }
+}
+
+function closeMobileSidebar() {
+    const s = document.getElementById("sidebar");
+    const bd = document.querySelector(".side-backdrop");
+    if (s) s.classList.remove("show");
+    if (bd) bd.classList.remove("show");
+}
+
+// =====================
+// UTILITIES
+// =====================
+function formatViews(n) {
+    if (!n) return "";
+    n = parseInt(n);
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
+    return n.toString();
+}
+
+function timeAgo(dateStr) {
+    if (!dateStr) return "";
+    const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+    if (diff < 60) return "توّا";
+    if (diff < 3600) return Math.floor(diff / 60) + " دقيقة";
+    if (diff < 86400) return Math.floor(diff / 3600) + " ساعات";
+    if (diff < 2592000) return Math.floor(diff / 86400) + " أيام";
+    if (diff < 31536000) return Math.floor(diff / 2592000) + " أشهر";
+    return Math.floor(diff / 31536000) + " سنين";
+}
