@@ -597,3 +597,13 @@ save() {
             document.body.classList.remove('lang-fr');
         }
     }
+    function bindFormListeners() {
+        const fields = {
+            accNamePro: 'accountName', accEmailPro: 'accountEmail',
+            channelNamePro: 'channelName', channelBioPro: 'channelBio',
+            channelCatPro: 'channelCategory', channelLinkPro: 'channelLink',
+            channelSocialPro: 'channelSocial', langSelectPro: 'language',
+            qualitySelectPro: 'quality', fontSelectPro: 'fontSize',
+            startPagePro: 'startPage' // الخيار الجديد
+        };
+        // ... بقية الكود كما هو
