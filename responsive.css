@@ -43,3 +43,35 @@
   .hdr{gap:10px;padding:0 12px}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+/* ========== Layout الأساسي: Sidebar على اليسار ========== */
+.settings-layout-pro {
+    display: flex;
+    flex-direction: row-reverse; /* يجبر القائمة الجانبية باش تجي عاليسار في الـ RTL */
+    gap: 32px;
+    align-items: flex-start;
+}
+
+.settings-sidebar-pro {
+    width: 260px;
+    flex-shrink: 0;
+    position: sticky;
+    top: calc(var(--header-h) + 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px;
+}
+
+.settings-content-pro {
+    flex: 1;
+    min-width: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    min-height: 500px;
+    position: relative;
+}
