@@ -313,3 +313,327 @@ function timeAgo(dateStr) {
     if (diff < 31536000) return Math.floor(diff / 2592000) + " أشهر";
     return Math.floor(diff / 31536000) + " سنين";
 }
+// =====================================================================
+// UI.JS - محرك الواجهة والشبكة (TunisianTube 🇹🇳)
+// =====================================================================
+
+function escStr(s) {
+    return (s || "").replace(/'/g, "\\'");
+}
+
+function getVideosList() {
+    if (typeof allVideos !== "undefined" && Array.isArray(allVideos) && allVideos.length > 0) {
+        return allVideos;
+    }
+    if (typeof rawVideosData !== "undefined" && Array.isArray(rawVideosData) && rawVideosData.length > 0) {
+        return rawVideosData;
+    }
+    return [];
+}
+
+const CAT_FA_ICONS = {
+    "Design": "fa-palette",
+    "Programmation": "fa-code",
+    "Langues": "fa-language",
+    "Marketing": "fa-chart-line",
+    "Montage": "fa-clapperboard",
+    "Freelance": "fa-briefcase",
+    "Bac & Etudes": "fa-graduation-cap",
+    "Bureautique": "fa-file-excel",
+    "Autre": "fa-box"
+};
+
+// ==========================================
+// 1. بناء القائمة الجانبية (Sidebar Vertical)
+// ==========================================
+function buildSide() {
+    const vids = getVideosList();
+    const cats = {}, subs = {};
+
+    vids.forEach(v => {
+        if (!v) return;
+        const c = v.category || "Autre";
+        cats[c] = (cats[c] || 0) + 1;
+        const t = v.topic || "";
+        if (t && t !== "Général") subs[t] = (subs[t] || 0) + 1;
+    });
+
+    const cl = document.getElementById("catList");
+    if (cl) {
+        let html = '<h4>الرئيسية</h4>';
+        html += `<button class="side-btn active" onclick="showAll()">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="side-txt">الرئيسية</span>
+                    <span class="side-cnt">${vids.length}</span>
+                 </button>`;
+        
+        html += '<h4>التصنيفات</h4>';
+        Object.entries(cats).sort((a, b) => b[1] - a[1]).forEach(([c, n]) => {
+            const icon = CAT_FA_ICONS[c] || "fa-folder";
+            html += `<button class="side-btn" onclick="navigate('category','${escStr(c)}')">
+                        <i class="fa-solid ${icon}"></i>
+                        <span class="side-txt">${c}</span>
+                        <span class="side-cnt">${n}</span>
+                     </button>`;
+        });
+        cl.innerHTML = html;
+    }
+
+    const sl = document.getElementById("subList");
+    if (sl) {
+        let html2 = '<h4>المواضيع الأكثر طلباً 🔥</h4>';
+        Object.entries(subs).sort((a, b) => b[1] - a[1]).slice(0, 15).forEach(([t, n]) => {
+            html2 += `<button class="side-btn" onclick="filterSubHome('${escStr(t)}')">
+                        <i class="fa-solid fa-hashtag"></i>
+                        <span class="side-txt">${t}</span>
+                        <span class="side-cnt">${n}</span>
+                      </button>`;
+        });
+        sl.innerHTML = html2;
+    }
+
+    updateHeroStats(vids, cats);
+}
+
+function updateHeroStats(vids, cats) {
+    const totalVids = vids.length || 5007;
+    const catCount = Object.keys(cats).length || 8;
+    
+    if (document.getElementById("statV")) document.getElementById("statV").textContent = totalVids;
+    if (document.getElementById("vCount")) document.getElementById("vCount").textContent = totalVids + " دورة";
+    if (document.getElementById("statC")) document.getElementById("statC").textContent = catCount;
+    if (document.getElementById("statH")) document.getElementById("statH").textContent = "+1500h";
+}
+
+// ==========================================
+// 2. بناء شريط الفلاتر (YouTube Chips)
+// ==========================================
+function buildChips() {
+    const fb = document.getElementById("filterBar");
+    if (!fb) return;
+    
+    const vids = getVideosList();
+    const categories = [...new Set(vids.map(v => v.category || "Autre"))];
+    
+    let html = '<button class="chip active" onclick="showAll()">الكل</button>';
+    categories.forEach(c => {
+        html += `<button class="chip" onclick="filterChipHome('${escStr(c)}')">${c}</button>`;
+    });
+    fb.innerHTML = html;
+}
+
+// ==========================================
+// 3. كارت الفيديو (YouTube Design)
+// ==========================================
+function ytCardHTML(v) {
+    const thumb = v.thumb || `https://img.youtube.com/vi/${v.id}/hqdefault.jpg`;
+    const dur = v.duration ? `<span class="dur">${v.duration}</span>` : '';
+    const catBadge = v.category ? `<span class="cat-chip">${v.category}</span>` : '';
+    const views = v.views ? formatViews(v.views) + ' مشاهدة' : (v.category || 'دورة تونسية');
+    const time = v.date ? ' • ' + timeAgo(v.date) : '';
+    
+    return `
+    <div class="card" onclick="navigate('video', {id: '${v.id}'})">
+        <div class="thumb">
+            <img src="${thumb}" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${v.id}/hqdefault.jpg'">
+            ${dur}
+            ${catBadge}
+            <div class="thumb-play"><span><i class="fa-solid fa-play"></i></span></div>
+        </div>
+        <div class="card-body">
+            <div class="card-info">
+                <div class="card-title">${v.title || 'دورة تعليمية'}</div>
+                <div class="card-ch"><i class="fa-solid fa-circle-check"></i> ${v.channel || 'TunisianTube'}</div>
+                <div class="card-meta">${views}${time}</div>
+                <span class="card-topic">🇹🇳 ${v.topic || v.category || ''}</span>
+            </div>
+        </div>
+    </div>`;
+}
+
+// ==========================================
+// 4. محرك العرض والتحميل اللانهائي
+// ==========================================
+function renderHome() { 
+    applyFilters(); 
+}
+
+function setListAndRender(list) {
+    activeList = list; 
+    displayedCount = 0;
+    
+    const g = document.getElementById("grid");
+    const e = document.getElementById("empty");
+    
+    if (g) g.innerHTML = "";
+    if (!activeList.length) {
+        if (e) {
+            e.style.display = "block";
+            e.innerHTML = `
+                <div class="e-i"><i class="fa-solid fa-face-sad-tear"></i></div>
+                <h2>ما فما حتى فيديو 🇹🇳</h2>
+                <p>بدل الفلتر ولا لوج بكلمة أخرى</p>`;
+        }
+        return;
+    }
+    if (e) e.style.display = "none";
+    
+    setupInfiniteScroll();
+    renderNextBatch();
+}
+
+function setupInfiniteScroll() {
+    if (typeof observer !== "undefined" && observer) observer.disconnect();
+    const sentinel = document.getElementById("sentinel");
+    if (!sentinel) return;
+    
+    observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) renderNextBatch();
+    }, { rootMargin: "400px" });
+    
+    observer.observe(sentinel);
+}
+
+function renderNextBatch() {
+    const g = document.getElementById("grid");
+    if (!g) return;
+    
+    const batch = activeList.slice(displayedCount, displayedCount + BATCH_SIZE);
+    if (!batch.length) return;
+    
+    displayedCount += batch.length;
+    g.insertAdjacentHTML("beforeend", batch.map(ytCardHTML).join(""));
+}
+
+// ==========================================
+// 5. الفلاتر والبحث
+// ==========================================
+function showAll() {
+    currentFilter = { cat: null, sub: null, search: "" };
+    const si = document.getElementById("searchInput"); 
+    if (si) si.value = "";
+    
+    document.querySelectorAll(".side-btn, .chip").forEach(b => b.classList.remove("active"));
+    document.querySelector(".chip")?.classList.add("active");
+    navigate("home");
+}
+
+function filterChipHome(c) {
+    currentFilter.cat = c; 
+    currentFilter.sub = null;
+    document.querySelectorAll(".chip").forEach(b => b.classList.remove("active"));
+    if (event && event.target) event.target.classList.add("active");
+    navigate("home");
+}
+
+function filterSubHome(s) {
+    currentFilter.sub = s;
+    document.querySelectorAll("#subList .side-btn").forEach(b => b.classList.remove("active"));
+    if (event && event.target && event.target.closest) {
+        event.target.closest(".side-btn")?.classList.add("active");
+    }
+    navigate("home");
+}
+
+function onSearchInput() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        currentFilter.search = (document.getElementById("searchInput")?.value || "").toLowerCase();
+        navigate("home");
+    }, 300);
+}
+
+function applyFilters() {
+    let r = getVideosList();
+    if (currentFilter.cat) r = r.filter(v => v.category === currentFilter.cat);
+    if (currentFilter.sub) r = r.filter(v => v.topic === currentFilter.sub);
+    if (currentFilter.search) {
+        r = r.filter(v => 
+            ((v.title || "") + (v.channel || "") + (v.topic || "") + (v.category || ""))
+            .toLowerCase().includes(currentFilter.search)
+        );
+    }
+    setListAndRender(r);
+}
+
+// ==========================================
+// 6. تحميل الصفحات الجانبية
+// ==========================================
+function loadCategoryPage(cat) {
+    const ci = document.getElementById("catIcon"); 
+    if (ci) ci.innerHTML = `<i class="fa-solid ${CAT_FA_ICONS[cat] || 'fa-folder'}"></i>`;
+    
+    const ct = document.getElementById("catTitle"); 
+    if (ct) ct.textContent = cat;
+    
+    const cs = document.getElementById("catSub"); 
+    if (cs) {
+        const count = getVideosList().filter(v => v.category === cat).length;
+        cs.textContent = count + " دورة بالدارجة 🇹🇳";
+    }
+    
+    const cg = document.getElementById("categoryGrid");
+    if (cg) {
+        cg.innerHTML = getVideosList().filter(v => v.category === cat).map(ytCardHTML).join("");
+    }
+}
+
+function renderGridPage(gid, list) {
+    const g = document.getElementById(gid); 
+    if (!g) return;
+    
+    if (!list.length) { 
+        g.innerHTML = `
+            <div class="empty-state" style="grid-column:1/-1; text-align:center; padding:60px;">
+                <h2>فارغة 😅</h2>
+                <p>ما فما شيء لهنا توّا</p>
+            </div>`; 
+        return; 
+    }
+    g.innerHTML = list.map(ytCardHTML).join("");
+}
+
+function loadLikedPage() {
+    try {
+        const likes = JSON.parse(localStorage.getItem("tt_likes") || "{}");
+        const ids = Object.keys(likes).filter(k => likes[k]);
+        renderGridPage("likedGrid", getVideosList().filter(v => ids.includes(v.id)));
+    } catch(e) { 
+        renderGridPage("likedGrid", []); 
+    }
+}
+
+function loadSubscriptionsPage() { 
+    renderGridPage("subsGrid", []); 
+}
+
+function loadHistoryPage() {
+    try {
+        const h = JSON.parse(localStorage.getItem("tt_history") || "[]");
+        renderGridPage("historyGrid", h.map(id => getVideosList().find(v => v.id === id)).filter(Boolean));
+    } catch(e) { 
+        renderGridPage("historyGrid", []); 
+    }
+}
+
+// ==========================================
+// 7. أدوات تواريخ ومشاهدات
+// ==========================================
+function formatViews(n) {
+    n = parseInt(n || 0); 
+    if (!n) return "";
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
+    return "" + n;
+}
+
+function timeAgo(d) {
+    if (!d) return "جديد";
+    const diff = Math.floor((Date.now() - new Date(d)) / 1000);
+    if (diff < 60) return "توّا";
+    if (diff < 3600) return "قبل " + Math.floor(diff / 60) + " دقيقة";
+    if (diff < 86400) return "قبل " + Math.floor(diff / 3600) + " ساعات";
+    if (diff < 2592000) return "قبل " + Math.floor(diff / 86400) + " أيام";
+    if (diff < 31536000) return "قبل " + Math.floor(diff / 2592000) + " أشهر";
+    return "قبل " + Math.floor(diff / 31536000) + " سنين";
+}
