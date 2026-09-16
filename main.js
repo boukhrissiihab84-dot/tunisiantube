@@ -512,3 +512,52 @@
     });
 
 })();
+save() {
+    try {
+        // 1. حفظ الإعدادات
+        localStorage.setItem(
+            SETTINGS_KEY,
+            JSON.stringify(this.current)
+        );
+
+        // 2. تحديث الحالة الداخلية
+        this.original = { ...this.current };
+        this.hasChanges = false;
+
+        // 3. تطبيق الـ Theme
+        if (typeof this.applyTheme === 'function') {
+            this.applyTheme();
+        }
+
+        // 4. تحديث الفورم
+        if (typeof applyValuesToForm === 'function') {
+            applyValuesToForm();
+        }
+
+        // 5. تحديث Save Bar
+        if (typeof this.updateSaveBar === 'function') {
+            this.updateSaveBar();
+        }
+
+        // 6. تطبيق الإعدادات مباشرة على الموقع
+        if (typeof applySettingsToUI === 'function') {
+            applySettingsToUI(this.current);
+        }
+
+        // 7. رسالة النجاح
+        if (typeof showToast === 'function') {
+            showToast('تم حفظ التعديلات بنجاح ✅', 'success');
+        }
+
+        return true;
+
+    } catch (e) {
+        console.error('Settings save error:', e);
+
+        if (typeof showToast === 'function') {
+            showToast('صارت مشكلة في الحفظ ❌', 'error');
+        }
+
+        return false;
+    }
+},
