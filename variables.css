@@ -68,3 +68,50 @@
 body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
+/* Light Mode - إصلاحات إضافية */
+[data-theme="light"] {
+    --bg: #f9f9f9;
+    --surface: #ffffff;
+    --surface2: #f2f2f2;
+    --surface3: #e5e5e5;
+    --text: #0f0f0f;
+    --text2: #606060;
+    --text3: #909090;
+    --border: rgba(0, 0, 0, 0.1);
+    --border2: rgba(0, 0, 0, 0.15);
+    --accent: #e11a24;
+    --accent-soft: rgba(225, 26, 36, 0.1);
+}
+
+[data-theme="light"] body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+[data-theme="light"] .settings-content-pro,
+[data-theme="light"] .settings-sidebar-pro {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+[data-theme="light"] .form-input,
+[data-theme="light"] .form-textarea,
+[data-theme="light"] .form-select {
+    background: var(--surface2);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+[data-theme="light"] .save-bar {
+    background: #0f0f0f;
+    color: #fff;
+}
+
+[data-theme="light"] .save-bar-cancel {
+    color: #fff;
+}
+
+/* Smooth Theme Transition */
+body, .settings-content-pro, .settings-sidebar-pro, .form-input, .card {
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
