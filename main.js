@@ -607,3 +607,58 @@ save() {
             startPagePro: 'startPage' // الخيار الجديد
         };
         // ... بقية الكود كما هو
+/* =======================================================
+   PRO SETTINGS EXTRA UI
+   ======================================================= */
+   
+.settings-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 600px) {
+    .settings-grid-2 { grid-template-columns: 1fr; gap: 0; }
+}
+
+/* Color Picker */
+.color-picker-pro {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.color-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 3px solid transparent;
+}
+
+.color-dot:hover {
+    transform: scale(1.1);
+}
+
+.color-dot.active {
+    box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
+    transform: scale(1.1);
+}
+
+/* Compact Mode Styling (يطبق على body) */
+body.compact-mode .yt-grid {
+    gap: 16px 12px !important;
+}
+body.compact-mode .yt-card-info {
+    padding: 8px 0 0 !important;
+}
+body.compact-mode .yt-card-title {
+    font-size: 13px !important;
+}
+
+/* Reduce Motion Styling */
+body.reduce-motion * {
+    animation: none !important;
+    transition: none !important;
+}
