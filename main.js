@@ -561,3 +561,39 @@ save() {
         return false;
     }
 },
+    // =================================================================
+    // تطبيق الإعدادات فورا على واجهة المستخدم (Real-Time UI Update)
+    // =================================================================
+    function applySettingsToUI(settings) {
+        // 1. تحديث الاسم في القائمة المنسدلة
+        const ddName = document.getElementById('ddName');
+        if (ddName && settings.accountName) {
+            ddName.textContent = settings.accountName;
+        }
+
+        // 2. تحديث الإيميل في القائمة المنسدلة
+        const ddEmail = document.getElementById('ddEmail');
+        if (ddEmail && settings.accountEmail) {
+            ddEmail.textContent = settings.accountEmail;
+        }
+
+        // 3. تحديث تصويرة البروفايل في كل الموقع
+        if (settings.avatar) {
+            // تصويرة القائمة المنسدلة
+            const ddAvatar = document.getElementById('ddAvatar');
+            if (ddAvatar) ddAvatar.innerHTML = `<img src="${settings.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+            
+            // تصويرة الهيدر الفوقاني (لو موجودة)
+            const hdrAvatar = document.querySelector('.hdr-avatar');
+            if (hdrAvatar) hdrAvatar.innerHTML = `<img src="${settings.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        }
+
+        // 4. تطبيق اللغة (لو عندك سكربت ترجمة)
+        if (settings.language === 'fr') {
+            document.body.classList.add('lang-fr');
+            document.body.classList.remove('lang-dz');
+        } else {
+            document.body.classList.add('lang-dz');
+            document.body.classList.remove('lang-fr');
+        }
+    }
