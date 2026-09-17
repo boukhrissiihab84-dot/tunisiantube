@@ -1,14 +1,13 @@
 /* =======================================================
-   VARIABLES.CSS - Dark & Light Themes 🇹🇳
+   01-VARIABLES.CSS - YouTube 2024 Original Palette
    ======================================================= */
-
-/* ========== DARK MODE (Default - YouTube Style) ========== */
 :root,
 [data-theme="dark"] {
+    /* YouTube Official Dark Theme */
     --bg: #0f0f0f;
-    --surface: #212121;
-    --surface2: #272727;
-    --surface3: #3f3f3f;
+    --surface: #0f0f0f;
+    --surface2: #272727; /* Hover / Active buttons */
+    --surface3: #3f3f3f; /* Search bar border / chips */
     
     --text: #f1f1f1;
     --text2: #aaaaaa;
@@ -17,32 +16,24 @@
     --border: rgba(255, 255, 255, 0.1);
     --border2: rgba(255, 255, 255, 0.2);
     
-    --accent: #ff2d3f;
-    --accent-soft: rgba(255, 45, 63, 0.15);
-    --red: #ff0000;
+    /* اللمسة التونسية تقعد في الأزرار الأساسية */
+    --accent: #ff0000; /* YouTube Red */
+    --accent-soft: rgba(255, 0, 0, 0.15);
     
-    --gradient: linear-gradient(135deg, #ff2d3f, #ff7a3d);
-    --gradient2: linear-gradient(135deg, #ff2d3f, #c40818);
-    
-    --radius: 12px;
+    /* حواف يوتيوب الجديدة */
+    --radius: 12px; 
     --radius-sm: 8px;
     --radius-full: 9999px;
     
     --header-h: 56px;
     --side-w: 240px;
-    
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.7);
-    
-    --transition: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ========== LIGHT MODE (YouTube Light) ========== */
 [data-theme="light"] {
+    /* YouTube Official Light Theme */
     --bg: #ffffff;
-    --surface: #f9f9f9;
-    --surface2: #f0f0f0;
+    --surface: #ffffff;
+    --surface2: #f2f2f2;
     --surface3: #e5e5e5;
     
     --text: #0f0f0f;
@@ -52,66 +43,6 @@
     --border: rgba(0, 0, 0, 0.1);
     --border2: rgba(0, 0, 0, 0.2);
     
-    --accent: #e70013;
-    --accent-soft: rgba(231, 0, 19, 0.1);
-    --red: #cc0000;
-    
-    --gradient: linear-gradient(135deg, #e70013, #ff5e3a);
-    --gradient2: linear-gradient(135deg, #e70013, #b8000f);
-    
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
-    --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.18);
-}
-
-/* Smooth theme transition */
-body {
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-/* Light Mode - إصلاحات إضافية */
-[data-theme="light"] {
-    --bg: #f9f9f9;
-    --surface: #ffffff;
-    --surface2: #f2f2f2;
-    --surface3: #e5e5e5;
-    --text: #0f0f0f;
-    --text2: #606060;
-    --text3: #909090;
-    --border: rgba(0, 0, 0, 0.1);
-    --border2: rgba(0, 0, 0, 0.15);
-    --accent: #e11a24;
-    --accent-soft: rgba(225, 26, 36, 0.1);
-}
-
-[data-theme="light"] body {
-    background: var(--bg);
-    color: var(--text);
-}
-
-[data-theme="light"] .settings-content-pro,
-[data-theme="light"] .settings-sidebar-pro {
-    background: var(--surface);
-    border-color: var(--border);
-}
-
-[data-theme="light"] .form-input,
-[data-theme="light"] .form-textarea,
-[data-theme="light"] .form-select {
-    background: var(--surface2);
-    color: var(--text);
-    border-color: var(--border);
-}
-
-[data-theme="light"] .save-bar {
-    background: #0f0f0f;
-    color: #fff;
-}
-
-[data-theme="light"] .save-bar-cancel {
-    color: #fff;
-}
-
-/* Smooth Theme Transition */
-body, .settings-content-pro, .settings-sidebar-pro, .form-input, .card {
-    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    --accent: #cc0000;
+    --accent-soft: rgba(204, 0, 0, 0.1);
 }
