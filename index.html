@@ -1,30 +1,24 @@
-<!DOCTYPE html>
+<!<!DOCTYPE html>
 <html lang="ar" dir="rtl" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="TunisianTube - المنصة الأولى للتعليم بالدارجة التونسية. كورسات بلاش في البرمجة، التصميم، اللغات والتسويق.">
-    <meta name="theme-color" content="#0f0f0f">
-    <title>TunisianTube 🇹🇳 - تعلم بالدارجة</title>
+    <title>TunisianTube 🇹🇳 - منصة الدورات التونسية</title>
     <link rel="icon" type="image/png" href="logo.png">
     
     <!-- منع الفلاش الأبيض عند التحميل -->
     <script>
-        (function() {
-            try {
-                var s = JSON.parse(localStorage.getItem("tt_settings") || "{}");
-                if (s.theme) document.documentElement.setAttribute("data-theme", s.theme);
-            } catch(e) {}
-        })();
+        try {
+            var s = JSON.parse(localStorage.getItem("tt_settings") || "{}");
+            if (s.theme) document.documentElement.setAttribute("data-theme", s.theme);
+        } catch(e) {}
     </script>
     
     <!-- الخطوط والأيقونات -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <!-- ملفات CSS -->
+    
+    <!-- استدعاء الـ 14 ملف CSS الموزعة -->
     <link rel="stylesheet" href="variables.css">
     <link rel="stylesheet" href="base.css">
     <link rel="stylesheet" href="animations.css">
@@ -45,251 +39,187 @@
     <div class="app-container">
         
         <!-- ========================================== -->
-        <!-- 1. HEADER العلوي -->
+        <!-- 1. TOP HEADER (YouTube Clone B)            -->
         <!-- ========================================== -->
-        <header class="hdr">
-            <div class="hdr-left">
-                <button class="menu-i" onclick="toggleSidebar()" aria-label="فتح القائمة">
-                    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-                        <path fill="currentColor" d="M21 6H3V5h18v1zM21 12H3v-1h18v1zm0 6H3v-1h18v1z"/>
-                    </svg>
+        <header class="yt-header">
+            <div class="yt-header-left">
+                <button class="yt-icon-btn" id="menuToggleBtn" onclick="toggleSidebar()" aria-label="القائمة">
+                    <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M21 6H3V5h18v1zM21 12H3v-1h18v1zm0 6H3v-1h18v1z"/></svg>
                 </button>
-                <div class="logo-wrap" onclick="navigate('home')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();navigate('home');}" role="button" tabindex="0" aria-label="الصفحة الرئيسية">
-                    <img src="logo.png" alt="TunisianTube Logo" class="logo-img" onerror="this.style.display='none'">
-                    <span class="logo-t">Tunisian<span class="logo-r">Tube</span></span>
+                <div class="yt-logo" onclick="navigate('home')">
+                    <span class="yt-logo-red">🇹🇳</span>
+                    <span class="yt-logo-text">Tunisian<span>Tube</span></span>
                 </div>
             </div>
 
-            <div class="search-wrap">
-                <form class="search-inner" onsubmit="event.preventDefault(); onSearchSubmit();" role="search">
-                    <input type="text" id="searchInput" placeholder="لوّج على دورة..." oninput="onSearchInput()" aria-label="البحث">
-                    <button type="submit" class="search-btn" aria-label="ابحث">
-                        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                            <path fill="currentColor" d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
-                        </svg>
+            <div class="yt-header-center">
+                <form class="yt-search-pill" onsubmit="event.preventDefault(); navigate('home');">
+                    <input type="text" id="searchInput" placeholder="لوّج على دورة، برمجة، لغة..." oninput="onSearchInput()">
+                    <button type="submit" class="yt-search-btn" aria-label="بحث">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
                     </button>
                 </form>
             </div>
 
-            <div class="hdr-right">
-                <span class="vid-count" id="vCount">5007 دورة</span>
-                <button class="icon-btn" onclick="forceToggleTheme()" id="themeBtn" aria-label="تبديل الوضع الليلي">
-                    <i class="fa-solid fa-sun" aria-hidden="true"></i>
+            <div class="yt-header-right">
+                <button class="yt-icon-btn" onclick="forceToggleTheme()" id="themeBtn" aria-label="الوضع الليلي">
+                    <i class="fa-solid fa-moon"></i>
                 </button>
-                <button class="icon-btn" onclick="navigate('settings')" aria-label="الإعدادات">
-                    <i class="fa-solid fa-gear" aria-hidden="true"></i>
+                
+                <!-- زر الدخول (يظهر لغير المسجلين) -->
+                <button class="yt-auth-btn" id="headerAuthBtn" onclick="openAuth()">
+                    <i class="far fa-user-circle"></i> دخول
                 </button>
-                <div id="authArea"></div>
+                
+                <!-- بروفايل المستخدم (يظهر للمسجلين) -->
+                <div class="yt-user-menu" id="userMenuArea" style="display: none;">
+                    <div class="yt-avatar-header" onclick="toggleDropdown()">
+                        <img id="headerAvatar" src="https://img.icons8.com/color/96/user.png" alt="avatar">
+                    </div>
+                    
+                    <!-- Dropdown -->
+                    <div class="yt-dropdown" id="dropdown">
+                        <div class="yt-dropdown-header">
+                            <div class="dd-avatar" id="ddAvatar"><img src="https://img.icons8.com/color/96/user.png" alt="av"></div>
+                            <div class="yt-dropdown-info">
+                                <span id="ddName">اسم المستخدم</span>
+                                <span id="ddEmail">الايميل</span>
+                            </div>
+                        </div>
+                        <div class="yt-dropdown-divider"></div>
+                        <button class="yt-dropdown-item" onclick="forceGoSettings('channel')"><i class="fa-solid fa-tv"></i> قناتي</button>
+                        <button class="yt-dropdown-item" onclick="forceGoSettings('account')"><i class="fa-solid fa-user-gear"></i> الإعدادات</button>
+                        <div class="yt-dropdown-divider"></div>
+                        <button class="yt-dropdown-item" onclick="navigate('liked')"><i class="fa-solid fa-heart"></i> إعجابات</button>
+                        <button class="yt-dropdown-item" onclick="navigate('history')"><i class="fa-solid fa-clock-rotate-left"></i> السجل</button>
+                        <div class="yt-dropdown-divider"></div>
+                        <button class="yt-dropdown-item logout" onclick="logOut()"><i class="fa-solid fa-right-from-bracket"></i> خروج</button>
+                    </div>
+                </div>
             </div>
         </header>
 
         <!-- ========================================== -->
-        <!-- 2. DROPDOWN (القائمة المنسدلة) -->
+        <!-- 2. MAIN LAYOUT (YouTube Clone B)           -->
         <!-- ========================================== -->
-        <div class="dropdown" id="dropdown" role="menu" aria-hidden="true">
-            <div class="dd-header">
-                <div class="dd-avatar" id="ddAvatar">U</div>
-                <div>
-                    <div class="dd-name" id="ddName">User</div>
-                    <div class="dd-email" id="ddEmail"></div>
-                </div>
-            </div>
-            <div class="dd-sep"></div>
-            <div class="dd-item" onclick="forceGoSettings('channel')" role="menuitem" tabindex="0">
-                <i class="fa-solid fa-tv" aria-hidden="true"></i> <span>قناتي</span>
-            </div>
-            <div class="dd-item" onclick="forceGoSettings('account')" role="menuitem" tabindex="0">
-                <i class="fa-solid fa-user-gear" aria-hidden="true"></i> <span>إعدادات الحساب</span>
-            </div>
-            <div class="dd-item" onclick="navigate('settings')" role="menuitem" tabindex="0">
-                <i class="fa-solid fa-gear" aria-hidden="true"></i> <span>إعدادات المنصة</span>
-            </div>
-            <div class="dd-sep"></div>
-            <div class="dd-item" onclick="navigate('liked')" role="menuitem" tabindex="0">
-                <i class="fa-solid fa-heart" aria-hidden="true"></i> <span>فيديوهات عجبتني</span>
-            </div>
-            <div class="dd-item" onclick="navigate('subscriptions')" role="menuitem" tabindex="0">
-                <i class="fa-solid fa-bell" aria-hidden="true"></i> <span>الاشتراكات</span>
-            </div>
-            <div class="dd-item" onclick="navigate('history')" role="menuitem" tabindex="0">
-                <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> <span>السجل</span>
-            </div>
-            <div class="dd-sep"></div>
-            <div class="dd-item danger" onclick="logOut()" role="menuitem" tabindex="0">
-                <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> <span>خروج</span>
-            </div>
-        </div>
-
-        <!-- ========================================== -->
-        <!-- 3. LAYOUT (Sidebar + Main) -->
-        <!-- ========================================== -->
-        <div class="layout">
-            <div class="side-backdrop" onclick="closeMobileSidebar()" aria-hidden="true"></div>
+        <div class="yt-layout">
             
-            <aside class="side" id="sidebar" aria-label="القائمة الجانبية">
-                <div id="catList"></div>
-                <div id="subList"></div>
+            <!-- SIDEBAR -->
+            <div class="side-backdrop" onclick="toggleSidebar()"></div>
+            <aside class="yt-sidebar" id="sidebar">
+                <div id="catList">
+                    <!-- يتم بناؤه ديناميكيًا من ui.js -->
+                </div>
+                <div id="subList">
+                    <!-- يتم بناؤه ديناميكيًا من ui.js -->
+                </div>
             </aside>
 
-            <main class="main" id="mainContent">
-
-                <!-- ============ الصفحة الرئيسية ============ -->
-                <div class="page active" id="page-home">
+            <!-- MAIN CONTENT -->
+            <main class="yt-main" id="mainContent">
+                
+                <!-- ================= الصفحة الرئيسية ================= -->
+                <div id="homePage" class="page active">
+                    <!-- شريط الفلاتر (YouTube Chips) -->
+                    <div class="yt-chips-container" id="filterBar"></div>
                     
-                    <section class="hero" id="hero">
-                        <div class="hero-blob1" aria-hidden="true"></div>
-                        <div class="hero-blob2" aria-hidden="true"></div>
-                        <span class="hero-kicker">
-                            <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> المنصة الأولى للتعليم في تونس
-                        </span>
-                        
-                        <h1>تعلّم حاجة <span class="grad">جديدة كل يوم</span><br><span class="ar">بالدارجة التونسية 🇹🇳</span></h1>
-                        
-                        <p>كورسات بلاش في البرمجة، التصميم، اللغات والتسويق — ملمومين ومختارين خصيصا ليك باش تطور من روحك.</p>
-                        
-                        <div class="hero-cta">
-                            <button class="hero-btn primary" onclick="document.getElementById('grid').scrollIntoView({behavior: 'smooth'})">
-                                <i class="fa-solid fa-play" aria-hidden="true"></i> ابدا تقرا توّا
-                            </button>
-                            <button class="hero-btn ghost" onclick="navigate('settings')">
-                                <i class="fa-solid fa-sliders" aria-hidden="true"></i> الإعدادات
-                            </button>
-                        </div>
-                        
-                        <div class="hero-stats">
-                            <div class="hstat"><b>5007</b><span>دورة</span></div>
-                            <div class="hstat"><b>8</b><span>تصنيفات</span></div>
-                            <div class="hstat"><b><i>100%</i></b><span>بلاش</span></div>
-                            <div class="hstat"><b>+1500h</b><span>ساعات قراية</span></div>
-                        </div>
-                    </section>
-                    
-                    <div class="filter-bar" id="filterBar"></div>
-                    <div class="grid" id="grid"></div>
+                    <!-- Grid الفيديوهات -->
+                    <div class="yt-grid" id="grid"></div>
                     <div id="sentinel"></div>
-                    
-                    <div class="empty-state" id="empty" style="display:none">
-                        <div class="e-i"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></div>
-                        <h2>ما فما حتى فيديو</h2>
-                        <p>بدل الفلتر ولا لوج بكلمة أخرى.</p>
+                    <div class="yt-empty" id="empty" style="display: none;">
+                        <i class="fa-solid fa-magnifying-glass" style="font-size:48px; color:var(--text3); margin-bottom:16px;"></i>
+                        <h2>ما فما حتى فيديو 🇹🇳</h2>
+                        <p>جرّب تبدّل الفلتر ولا البحث</p>
                     </div>
                 </div>
 
-                <!-- ============ صفحة الفيديو ============ -->
-                <div class="page" id="page-video">
-                    <div class="video-page-container">
-                        <div class="video-main">
-                            <button class="back-btn" onclick="navigate('home')">
-                                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i> رجوع
-                            </button>
-                            <div class="video-player-large" id="playerLarge"></div>
-                            <div class="video-info-large">
-                                <h1 class="video-title-large" id="mTitleLarge"></h1>
-                                <div class="channel-row">
-                                    <div class="channel-info">
-                                        <div class="channel-avatar" id="mChanAvatar">C</div>
-                                        <div>
-                                            <h3 id="mChanLarge">Channel</h3>
-                                            <p id="mCatLarge"></p>
-                                        </div>
-                                        <button class="subscribe-btn" id="subscribeBtn" onclick="toggleSubFromPage()">
-                                            <i class="fa-solid fa-bell" aria-hidden="true"></i> <span>إشتراك</span>
-                                        </button>
-                                    </div>
-                                    <div class="video-actions-row" id="mActionsLarge"></div>
-                                </div>
-                                <div class="video-description" id="mDescLarge"></div>
-                                <div class="comments-large" id="cmtSectionLarge"></div>
-                            </div>
-                        </div>
-                        <aside class="related-videos" aria-label="فيديوهات مشابهة">
-                            <h3><i class="fa-solid fa-tv" aria-hidden="true"></i> فيديوهات مشابهة</h3>
-                            <div id="relatedList"></div>
-                        </aside>
-                    </div>
-                </div>
-
-                <!-- ============ صفحة الإعدادات ============ -->
-                <div class="page" id="page-settings">
-                    <button class="back-btn" onclick="navigate('home')">
-                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i> رجوع
-                    </button>
+                <!-- ================= صفحة الإعدادات Pro ================= -->
+                <div id="settingsPage" class="page">
                     <div class="settings-container-pro">
                         <div class="settings-header-pro">
-                            <h2><i class="fa-solid fa-gear" aria-hidden="true"></i> الإعدادات</h2>
-                            <p>تحكم في حسابك، قناتك، وتفضيلاتك.</p>
+                            <h2><i class="fa-solid fa-gear"></i> إعدادات المنصة</h2>
+                            <p>تحكم في مظهر الموقع، حسابك، وتفضيلاتك بكل سهولة.</p>
                         </div>
+                        
                         <div class="settings-layout-pro">
-                            <aside class="settings-sidebar-pro" aria-label="أقسام الإعدادات">
-                                <button class="tab-btn-pro active" data-tab="account" onclick="forceOpenSettingsTab('account', this)">
-                                    <i class="fa-solid fa-circle-user" aria-hidden="true"></i> حسابي
-                                </button>
-                                <button class="tab-btn-pro" data-tab="channel" onclick="forceOpenSettingsTab('channel', this)">
-                                    <i class="fa-solid fa-tv" aria-hidden="true"></i> قناتي
-                                </button>
-                                <button class="tab-btn-pro" data-tab="preferences" onclick="forceOpenSettingsTab('preferences', this)">
-                                    <i class="fa-solid fa-sliders" aria-hidden="true"></i> تفضيلات
-                                </button>
-                                <button class="tab-btn-pro danger" data-tab="privacy" onclick="forceOpenSettingsTab('privacy', this)">
-                                    <i class="fa-solid fa-shield-halved" aria-hidden="true"></i> حماية
-                                </button>
+                            <!-- القائمة الجانبية للإعدادات -->
+                            <aside class="settings-sidebar-pro">
+                                <button class="tab-btn-pro active" data-tab="account" onclick="forceOpenSettingsTab('account', this)"><i class="fa-solid fa-circle-user"></i> حسابي</button>
+                                <button class="tab-btn-pro" data-tab="appearance" onclick="forceOpenSettingsTab('appearance', this)"><i class="fa-solid fa-paint-roller"></i> المظهر</button>
+                                <button class="tab-btn-pro" data-tab="player" onclick="forceOpenSettingsTab('player', this)"><i class="fa-solid fa-circle-play"></i> مشغل الفيديو</button>
+                                <button class="tab-btn-pro danger" data-tab="privacy" onclick="forceOpenSettingsTab('privacy', this)"><i class="fa-solid fa-shield-halved"></i> الخصوصية</button>
                             </aside>
+
+                            <!-- محتوى الإعدادات -->
                             <main class="settings-content-pro">
                                 
-                                <!-- Account -->
+                                <!-- حسابي -->
                                 <div id="set-pro-account" class="settings-pane-pro active">
-                                    <h3><i class="fa-solid fa-user-gear" aria-hidden="true"></i> معلومات شخصية</h3>
-                                    <div id="accBody">
-                                        <div class="avatar-upload-box-pro">
-                                            <div class="avatar-preview-wrapper-pro" id="accAvatarWrapPro">
-                                                <i class="fa-solid fa-camera" aria-hidden="true"></i>
-                                            </div>
-                                            <div class="avatar-actions-pro">
-                                                <label class="btn-secondary-pro" for="accPicInputPro">
-                                                    <i class="fa-solid fa-upload" aria-hidden="true"></i> بدّل التصويرة
-                                                </label>
-                                                <input type="file" id="accPicInputPro" accept="image/*" hidden onchange="forceAvatarChange(event)">
-                                            </div>
+                                    <h3><i class="fa-solid fa-user-gear"></i> معلومات الحساب</h3>
+                                    <div class="avatar-upload-box-pro">
+                                        <div class="avatar-preview-wrapper-pro" id="accAvatarWrapPro"><i class="fa-solid fa-camera"></i></div>
+                                        <div class="avatar-actions-pro">
+                                            <label class="btn-secondary-pro" for="accPicInputPro"><i class="fa-solid fa-upload"></i> بدّل التصويرة</label>
+                                            <input type="file" id="accPicInputPro" accept="image/*" style="display:none" onchange="forceAvatarChange(event)">
+                                        </div>
+                                    </div>
+                                    <div class="settings-grid-2">
+                                        <div class="form-group">
+                                            <label class="form-label">الاسم الكامل</label>
+                                            <input class="form-input" id="accNamePro" placeholder="مثال: يوسف التونسي">
                                         </div>
                                         <div class="form-group">
-                                            <label class="form-label" for="accNamePro">الاسم</label>
-                                            <input class="form-input" id="accNamePro" type="text">
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label" for="accEmailPro">الإيميل</label>
-                                            <input class="form-input" id="accEmailPro" type="email" disabled>
+                                            <label class="form-label">المعرّف (Handle)</label>
+                                            <input class="form-input" id="accHandlePro" placeholder="@youssef_tn">
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Channel -->
-                                <div id="set-pro-channel" class="settings-pane-pro">
-                                    <h3><i class="fa-solid fa-circle-play" aria-hidden="true"></i> قناتي</h3>
-                                    <div class="form-group">
-                                        <label class="form-label" for="channelNamePro">اسم القناة</label>
-                                        <input class="form-input" id="channelNamePro" type="text">
-                                    </div>
-                                </div>
-
-                                <!-- Preferences -->
-                                <div id="set-pro-preferences" class="settings-pane-pro">
-                                    <h3><i class="fa-solid fa-sliders" aria-hidden="true"></i> تفضيلات</h3>
+                                <!-- المظهر -->
+                                <div id="set-pro-appearance" class="settings-pane-pro">
+                                    <h3><i class="fa-solid fa-paint-roller"></i> تخصيص المظهر</h3>
                                     <div class="setting-row-pro">
-                                        <div>
-                                            <div class="setting-title-pro">
-                                                <i class="fa-solid fa-moon" aria-hidden="true"></i> الوضع الليلي
-                                            </div>
+                                        <div><div class="setting-title-pro"><i class="fa-solid fa-moon"></i> الوضع الليلي</div><div class="setting-desc-pro">يريح العينين في الليل</div></div>
+                                        <div class="toggle" id="t-pro-dark" onclick="toggleSetPro('theme')"></div>
+                                    </div>
+                                    <div class="setting-row-pro" style="flex-direction: column; align-items: flex-start;">
+                                        <div><div class="setting-title-pro"><i class="fa-solid fa-palette"></i> لون المنصة</div><div class="setting-desc-pro">اختار اللون اللي يعجبك للمنصة</div></div>
+                                        <div class="color-picker-pro">
+                                            <div class="color-dot active" style="background:#ff0000;" onclick="changeThemeColor('#ff0000', this)"></div> <!-- يوتيوب -->
+                                            <div class="color-dot" style="background:#e11a24;" onclick="changeThemeColor('#e11a24', this)"></div> <!-- تونس -->
+                                            <div class="color-dot" style="background:#3b82f6;" onclick="changeThemeColor('#3b82f6', this)"></div> <!-- أزرق -->
+                                            <div class="color-dot" style="background:#10b981;" onclick="changeThemeColor('#10b981', this)"></div> <!-- أخضر -->
                                         </div>
-                                        <div class="toggle" id="t-pro-dark" onclick="forceToggleTheme()" role="switch" tabindex="0"></div>
+                                    </div>
+                                    <div class="setting-row-pro">
+                                        <div><div class="setting-title-pro"><i class="fa-solid fa-compress"></i> الوضع المضغوط</div><div class="setting-desc-pro">تصغير حجم الكروت</div></div>
+                                        <div class="toggle" id="t-pro-compact" onclick="toggleSetPro('compactMode')"></div>
                                     </div>
                                 </div>
 
-                                <!-- Privacy -->
+                                <!-- المشغل -->
+                                <div id="set-pro-player" class="settings-pane-pro">
+                                    <h3><i class="fa-solid fa-circle-play"></i> إعدادات الفيديو</h3>
+                                    <div class="setting-row-pro">
+                                        <div><div class="setting-title-pro"><i class="fa-solid fa-play"></i> التشغيل التلقائي</div></div>
+                                        <div class="toggle" id="t-pro-autoplay" onclick="toggleSetPro('autoplay')"></div>
+                                    </div>
+                                    <div class="form-group" style="margin-top:20px">
+                                        <label class="form-label"><i class="fa-solid fa-display"></i> الجودة الافتراضية</label>
+                                        <select class="form-select" id="prefQualityPro"><option value="auto">Auto</option><option value="1080p">1080p</option><option value="720p">720p</option></select>
+                                    </div>
+                                </div>
+
+                                <!-- الخصوصية -->
                                 <div id="set-pro-privacy" class="settings-pane-pro">
-                                    <h3><i class="fa-solid fa-trash-can" aria-hidden="true"></i> حماية</h3>
+                                    <h3><i class="fa-solid fa-shield-halved"></i> الخصوصية والأمان</h3>
                                     <div class="danger-box-pro">
-                                        <div><h4>فسخ السجل</h4></div>
+                                        <div><h4>فسخ السجل</h4><p>تمسح الفيديوهات اللي تفرجت فاها</p></div>
                                         <button class="btn-danger-pro" onclick="clearHistoryPro()">فسخ</button>
+                                    </div>
+                                    <div class="danger-box-pro">
+                                        <div><h4>إعادة ضبط المصنع</h4><p>يرجع الموقع كيف ما تحل أول مرة</p></div>
+                                        <button class="btn-danger-extreme-pro" onclick="resetAllAppDataPro()">إعادة ضبط</button>
                                     </div>
                                 </div>
 
@@ -298,38 +228,23 @@
                     </div>
                 </div>
 
-                <!-- ============ صفحات أخرى ============ -->
-                <div class="page" id="page-liked">
-                    <button class="back-btn" onclick="navigate('home')">
-                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i> رجوع
-                    </button>
-                    <div class="grid" id="likedGrid"></div>
-                </div>
-                
-                <div class="page" id="page-subscriptions">
-                    <button class="back-btn" onclick="navigate('home')">
-                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i> رجوع
-                    </button>
-                    <div class="grid" id="subsGrid"></div>
-                </div>
-                
-                <div class="page" id="page-history">
-                    <button class="back-btn" onclick="navigate('home')">
-                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i> رجوع
-                    </button>
-                    <div class="grid" id="historyGrid"></div>
-                </div>
+                <!-- ================= صفحات أخرى ================= -->
+                <div id="videoPage" class="page"><div id="videoPlayerContainer"></div></div>
+                <div id="categoryPage" class="page"><div class="yt-grid" id="categoryGrid"></div></div>
+                <div id="likedPage" class="page"><div class="yt-page-header"><h2>فيديوهات أعجبتني</h2></div><div class="yt-grid" id="likedGrid"></div></div>
+                <div id="subscriptionsPage" class="page"><div class="yt-page-header"><h2>الاشتراكات</h2></div><div class="yt-grid" id="subsGrid"></div></div>
+                <div id="historyPage" class="page"><div class="yt-page-header"><h2>سجل المشاهدة</h2></div><div class="yt-grid" id="historyGrid"></div></div>
 
             </main>
         </div>
     </div>
 
-    <!-- ============ Firebase ============ -->
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-    <!-- ============ JS Files ============ -->
+    <!-- Scripts (B) -->
     <script src="data.js"></script>
     <script src="globals.js"></script>
     <script src="firebase-config.js"></script>
@@ -342,117 +257,5 @@
     <script src="router.js"></script>
     <script src="main.js"></script>
 
-    <!-- ============================================================== -->
-    <!-- سكربت الطوارئ: يضمن خدمة الأزرار والـ Dark Mode والصور -->
-    <!-- ============================================================== -->
-    <script>
-        (function() {
-            'use strict';
-
-            // 1. فرض الـ Dark Mode
-            window.forceToggleTheme = function() {
-                const html = document.documentElement;
-                const isDark = html.getAttribute('data-theme') === 'dark';
-                const newTheme = isDark ? 'light' : 'dark';
-                html.setAttribute('data-theme', newTheme);
-                
-                try {
-                    const settings = JSON.parse(localStorage.getItem('tt_settings') || '{}');
-                    settings.theme = newTheme;
-                    localStorage.setItem('tt_settings', JSON.stringify(settings));
-                } catch(e) {
-                    localStorage.setItem('tt_settings', JSON.stringify({theme: newTheme}));
-                }
-                
-                const btn = document.getElementById('themeBtn');
-                if (btn) {
-                    btn.innerHTML = newTheme === 'dark' 
-                        ? '<i class="fa-solid fa-sun" aria-hidden="true"></i>' 
-                        : '<i class="fa-solid fa-moon" aria-hidden="true"></i>';
-                }
-
-                // تحديث الـ toggle في الإعدادات
-                const toggle = document.getElementById('t-pro-dark');
-                if (toggle) {
-                    toggle.classList.toggle('active', newTheme === 'dark');
-                }
-            };
-
-            // 2. فرض تبديل التبويبات في الإعدادات
-            window.forceOpenSettingsTab = function(tabId, btn) {
-                document.querySelectorAll('.settings-pane-pro').forEach(function(p) {
-                    p.classList.remove('active');
-                    p.style.display = 'none';
-                });
-                document.querySelectorAll('.tab-btn-pro').forEach(function(b) {
-                    b.classList.remove('active');
-                });
-                
-                const target = document.getElementById('set-pro-' + tabId);
-                if (target) {
-                    target.classList.add('active');
-                    target.style.display = 'block';
-                }
-                if (btn) btn.classList.add('active');
-            };
-
-            // 3. فرض الدخول للإعدادات من الـ Dropdown
-            window.forceGoSettings = function(tab) {
-                if (typeof navigate === 'function') navigate('settings');
-                setTimeout(function() {
-                    const btn = document.querySelector('.tab-btn-pro[data-tab="' + tab + '"]');
-                    if (btn) forceOpenSettingsTab(tab, btn);
-                }, 100);
-            };
-
-            // 4. فرض عرض الصورة عند رفعها
-            window.forceAvatarChange = function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                // تحقق من نوع الملف
-                if (!file.type.startsWith('image/')) {
-                    alert('من فضلك اختار صورة صالحة');
-                    return;
-                }
-
-                // تحقق من الحجم (أقصى 5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('الصورة كبيرة برشا (أقصى 5MB)');
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function(ev) {
-                    const wrap = document.getElementById('accAvatarWrapPro');
-                    if (wrap) {
-                        wrap.innerHTML = '<img src="' + ev.target.result + '" alt="Avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;">';
-                    }
-                };
-                reader.onerror = function() {
-                    alert('ما نجّمناش نقراو الصورة');
-                };
-                reader.readAsDataURL(file);
-            };
-
-            // 5. دالة البحث عند الـ Submit
-            window.onSearchSubmit = function() {
-                if (typeof navigate === 'function') navigate('home');
-                if (typeof onSearchInput === 'function') onSearchInput();
-            };
-
-            // 6. تهيئة الـ Theme Button عند تحميل الصفحة
-            document.addEventListener('DOMContentLoaded', function() {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const btn = document.getElementById('themeBtn');
-                if (btn) {
-                    btn.innerHTML = currentTheme === 'dark' 
-                        ? '<i class="fa-solid fa-sun" aria-hidden="true"></i>' 
-                        : '<i class="fa-solid fa-moon" aria-hidden="true"></i>';
-                }
-            });
-
-        })();
-    </script>
 </body>
 </html>
