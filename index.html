@@ -1,24 +1,49 @@
-<!<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TunisianTube 🇹🇳 - منصة الدورات التونسية</title>
+
+    <meta name="description"
+        content="TunisianTube - المنصة التونسية للتعلم بالدارجة 🇹🇳">
+
+    <meta name="theme-color" content="#0f0f0f">
+
+    <title>TunisianTube 🇹🇳 - تعلم بالدارجة</title>
+
     <link rel="icon" type="image/png" href="logo.png">
-    
-    <!-- منع الفلاش الأبيض عند التحميل -->
+
+    <!-- Prevent white flash -->
     <script>
-        try {
-            var s = JSON.parse(localStorage.getItem("tt_settings") || "{}");
-            if (s.theme) document.documentElement.setAttribute("data-theme", s.theme);
-        } catch(e) {}
+        (() => {
+            try {
+                const saved = JSON.parse(
+                    localStorage.getItem("tt_settings") || "{}"
+                );
+
+                if (saved.theme) {
+                    document.documentElement.dataset.theme = saved.theme;
+                }
+            } catch (e) {}
+        })();
     </script>
-    
-    <!-- الخطوط والأيقونات -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <!-- استدعاء الـ 14 ملف CSS الموزعة -->
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    >
+
+    <!-- Existing CSS -->
     <link rel="stylesheet" href="variables.css">
     <link rel="stylesheet" href="base.css">
     <link rel="stylesheet" href="animations.css">
@@ -33,229 +58,3155 @@
     <link rel="stylesheet" href="settings.css">
     <link rel="stylesheet" href="misc.css">
     <link rel="stylesheet" href="responsive.css">
+
+    <!-- =========================================================
+         SYSTEM B - YOUTUBE 2024 OVERRIDE
+    ========================================================== -->
+    <style>
+
+        :root {
+            --yt-bg: #0f0f0f;
+            --yt-surface: #181818;
+            --yt-surface-2: #212121;
+            --yt-hover: #272727;
+            --yt-border: #303030;
+            --yt-text: #f1f1f1;
+            --yt-muted: #aaaaaa;
+            --yt-red: #ff0033;
+            --yt-accent: #ff0033;
+            --yt-sidebar: 240px;
+            --yt-sidebar-mini: 72px;
+            --yt-header: 64px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+            background: var(--yt-bg);
+            color: var(--yt-text);
+            font-family: "Cairo", "Inter", sans-serif;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        /* =====================================================
+           HEADER
+        ====================================================== */
+
+        .app-container {
+            min-height: 100vh;
+            background: var(--yt-bg);
+        }
+
+        .yt-header {
+            position: fixed;
+            inset: 0 0 auto 0;
+            height: var(--yt-header);
+            z-index: 1000;
+
+            display: flex;
+            align-items: center;
+
+            padding: 0 18px;
+
+            background: rgba(15, 15, 15, .97);
+            border-bottom: 1px solid #202020;
+        }
+
+        .hdr {
+            position: fixed;
+            inset: 0 0 auto 0;
+            height: var(--yt-header);
+            z-index: 1000;
+
+            display: flex;
+            align-items: center;
+
+            padding: 0 18px;
+
+            background: rgba(15, 15, 15, .97);
+            border-bottom: 1px solid #202020;
+        }
+
+        .hdr-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+
+            min-width: 240px;
+
+            order: 1;
+        }
+
+        .menu-i {
+            width: 40px;
+            height: 40px;
+
+            border: 0;
+            border-radius: 50%;
+
+            display: grid;
+            place-items: center;
+
+            background: transparent;
+            color: white;
+        }
+
+        .menu-i:hover {
+            background: #272727;
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            cursor: pointer;
+
+            user-select: none;
+        }
+
+        .logo-img {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+        }
+
+        .logo-t {
+            font-family: "Inter", sans-serif;
+            font-size: 21px;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -1px;
+        }
+
+        .logo-r {
+            color: var(--yt-red);
+        }
+
+        .search-wrap {
+            flex: 1;
+
+            display: flex;
+            justify-content: center;
+
+            padding: 0 30px;
+
+            order: 2;
+        }
+
+        .search-inner {
+            width: min(650px, 100%);
+            height: 44px;
+
+            display: flex;
+            align-items: center;
+
+            direction: rtl;
+
+            background: #121212;
+            border: 1px solid #303030;
+            border-radius: 24px;
+
+            overflow: hidden;
+        }
+
+        .search-inner:focus-within {
+            border-color: #666;
+        }
+
+        #searchInput {
+            flex: 1;
+
+            height: 100%;
+
+            padding: 0 18px;
+
+            border: 0;
+            outline: 0;
+
+            background: transparent;
+            color: white;
+
+            font-size: 15px;
+        }
+
+        #searchInput::placeholder {
+            color: #888;
+        }
+
+        .search-btn {
+            width: 64px;
+            height: 100%;
+
+            border: 0;
+            border-right: 1px solid #303030;
+
+            background: #222;
+            color: #ddd;
+
+            display: grid;
+            place-items: center;
+        }
+
+        .search-btn:hover {
+            background: #303030;
+        }
+
+        .hdr-right {
+            min-width: 240px;
+
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+
+            gap: 7px;
+
+            order: 3;
+        }
+
+        .vid-count {
+            display: none;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+
+            display: grid;
+            place-items: center;
+
+            border: 0;
+            border-radius: 50%;
+
+            background: transparent;
+            color: white;
+        }
+
+        .icon-btn:hover {
+            background: #272727;
+        }
+
+        /* =====================================================
+           MAIN LAYOUT
+        ====================================================== */
+
+        .layout {
+            display: flex;
+
+            min-height: 100vh;
+
+            padding-top: var(--yt-header);
+
+            direction: ltr;
+        }
+
+        .yt-sidebar,
+        .side {
+            position: fixed;
+
+            top: var(--yt-header);
+            left: 0;
+            right: auto;
+
+            width: var(--yt-sidebar);
+            height: calc(100vh - var(--yt-header));
+
+            z-index: 900;
+
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            padding: 12px;
+
+            background: var(--yt-bg);
+
+            direction: rtl;
+
+            border-right: 1px solid transparent;
+        }
+
+        .side::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .side::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 20px;
+        }
+
+        .main,
+        .yt-main {
+            width: calc(100% - var(--yt-sidebar));
+
+            min-height: calc(100vh - var(--yt-header));
+
+            margin-left: var(--yt-sidebar);
+            margin-right: 0;
+
+            padding: 20px 28px 60px;
+
+            direction: rtl;
+        }
+
+        /* FORCE LEFT SIDEBAR */
+        html[dir="rtl"] .layout {
+            direction: ltr;
+        }
+
+        html[dir="rtl"] .side {
+            left: 0 !important;
+            right: auto !important;
+        }
+
+        html[dir="rtl"] .main {
+            margin-left: var(--yt-sidebar) !important;
+            margin-right: 0 !important;
+        }
+
+        /* =====================================================
+           SIDEBAR BUTTONS
+        ====================================================== */
+
+        .side-btn,
+        .yt-side-btn {
+            width: 100%;
+
+            min-height: 44px;
+
+            display: flex;
+            align-items: center;
+
+            gap: 17px;
+
+            padding: 0 14px;
+
+            margin-bottom: 3px;
+
+            border: 0;
+            border-radius: 10px;
+
+            background: transparent;
+            color: #f1f1f1;
+
+            text-align: right;
+
+            transition: background .15s ease;
+        }
+
+        .side-btn:hover,
+        .yt-side-btn:hover {
+            background: #272727;
+        }
+
+        .side-btn.active,
+        .yt-side-btn.active {
+            background: #272727;
+            font-weight: 700;
+        }
+
+        .side-btn i,
+        .yt-side-btn i {
+            width: 24px;
+
+            color: #eee;
+
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .side-txt {
+            flex: 1;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            font-size: 14px;
+        }
+
+        .side-cnt {
+            color: #777;
+            font-size: 11px;
+        }
+
+        .side-divider {
+            height: 1px;
+            background: #303030;
+            margin: 12px 4px;
+        }
+
+        /* =====================================================
+           HOME
+        ====================================================== */
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .hero {
+            position: relative;
+
+            max-width: 1200px;
+
+            margin: 0 auto 25px;
+
+            padding: 38px 35px;
+
+            border-radius: 16px;
+
+            background:
+                radial-gradient(
+                    circle at 80% 20%,
+                    rgba(255, 0, 51, .14),
+                    transparent 35%
+                ),
+                #181818;
+
+            overflow: hidden;
+        }
+
+        .hero h1 {
+            position: relative;
+            z-index: 2;
+
+            margin: 15px 0 10px;
+
+            font-size: clamp(28px, 4vw, 48px);
+            line-height: 1.25;
+        }
+
+        .hero p {
+            position: relative;
+            z-index: 2;
+
+            max-width: 720px;
+
+            color: #aaa;
+
+            line-height: 1.9;
+        }
+
+        .hero-kicker {
+            position: relative;
+            z-index: 2;
+
+            color: #aaa;
+
+            font-size: 13px;
+        }
+
+        .grad {
+            color: var(--yt-red);
+        }
+
+        .hero-cta {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            gap: 10px;
+
+            margin-top: 20px;
+        }
+
+        .hero-btn {
+            border: 0;
+            border-radius: 22px;
+
+            padding: 10px 20px;
+
+            font-weight: 700;
+        }
+
+        .hero-btn.primary {
+            background: var(--yt-red);
+            color: white;
+        }
+
+        .hero-btn.ghost {
+            background: #303030;
+            color: white;
+        }
+
+        .hero-stats {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            flex-wrap: wrap;
+
+            gap: 40px;
+
+            margin-top: 28px;
+        }
+
+        .hstat {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .hstat b {
+            font-size: 21px;
+        }
+
+        .hstat span {
+            color: #888;
+            font-size: 12px;
+        }
+
+        /* =====================================================
+           CHIPS
+        ====================================================== */
+
+        .filter-bar {
+            display: flex;
+
+            gap: 10px;
+
+            overflow-x: auto;
+
+            padding: 4px 0 18px;
+
+            scrollbar-width: none;
+        }
+
+        .filter-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .yt-chip {
+            flex-shrink: 0;
+
+            border: 0;
+            border-radius: 9px;
+
+            padding: 8px 15px;
+
+            background: #272727;
+            color: #eee;
+
+            font-size: 13px;
+
+            transition: .15s;
+        }
+
+        .yt-chip:hover {
+            background: #3f3f3f;
+        }
+
+        .yt-chip.active {
+            background: white;
+            color: black;
+        }
+
+        /* =====================================================
+           VIDEO GRID
+        ====================================================== */
+
+        .grid,
+        .yt-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fill,
+                    minmax(260px, 1fr)
+                );
+
+            column-gap: 18px;
+            row-gap: 34px;
+
+            width: 100%;
+        }
+
+        .yt-card {
+            min-width: 0;
+
+            cursor: pointer;
+
+            color: white;
+
+            transition:
+                transform .15s ease,
+                opacity .15s ease;
+        }
+
+        .yt-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .yt-thumb-wrap {
+            position: relative;
+
+            width: 100%;
+
+            aspect-ratio: 16 / 9;
+
+            overflow: hidden;
+
+            border-radius: 12px;
+
+            background: #222;
+        }
+
+        .yt-thumb {
+            width: 100%;
+            height: 100%;
+
+            display: block;
+
+            object-fit: cover;
+
+            transition: transform .25s ease;
+        }
+
+        .yt-card:hover .yt-thumb {
+            transform: scale(1.025);
+        }
+
+        .yt-duration {
+            position: absolute;
+
+            bottom: 7px;
+            right: 7px;
+
+            padding: 2px 5px;
+
+            border-radius: 4px;
+
+            background: rgba(0,0,0,.85);
+
+            color: white;
+
+            font-family: Inter, sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .yt-badge-tounes {
+            position: absolute;
+
+            top: 8px;
+            left: 8px;
+
+            padding: 3px 6px;
+
+            border-radius: 5px;
+
+            background: rgba(0,0,0,.7);
+
+            font-size: 12px;
+        }
+
+        .yt-card-info {
+            display: grid;
+
+            grid-template-columns: 38px minmax(0,1fr) 28px;
+
+            gap: 10px;
+
+            padding-top: 11px;
+        }
+
+        .yt-ch-avatar {
+            width: 36px;
+            height: 36px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 50%;
+
+            background: #303030;
+            color: #ddd;
+
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .yt-card-text {
+            min-width: 0;
+        }
+
+        .yt-card-title {
+            margin: 0 0 4px;
+
+            font-size: 15px;
+            line-height: 1.45;
+            font-weight: 700;
+
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+
+            overflow: hidden;
+        }
+
+        .yt-card-channel,
+        .yt-card-meta {
+            margin: 0;
+
+            color: #aaa;
+
+            font-size: 12px;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .yt-card-menu {
+            width: 28px;
+            height: 28px;
+
+            border: 0;
+            border-radius: 50%;
+
+            background: transparent;
+            color: #aaa;
+
+            font-size: 21px;
+        }
+
+        .yt-card-menu:hover {
+            background: #272727;
+            color: white;
+        }
+
+        /* =====================================================
+           EMPTY
+        ====================================================== */
+
+        .yt-empty {
+            min-height: 300px;
+
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            gap: 8px;
+
+            grid-column: 1 / -1;
+
+            text-align: center;
+        }
+
+        .yt-empty h2 {
+            margin: 0;
+        }
+
+        .yt-empty p {
+            margin: 0;
+            color: #888;
+        }
+
+        /* =====================================================
+           SETTINGS
+        ====================================================== */
+
+        .settings-container-pro {
+            max-width: 1150px;
+            margin: 0 auto;
+        }
+
+        .settings-header-pro {
+            margin-bottom: 25px;
+        }
+
+        .settings-header-pro h2 {
+            margin: 0 0 5px;
+            font-size: 28px;
+        }
+
+        .settings-header-pro p {
+            margin: 0;
+            color: #888;
+        }
+
+        .settings-layout-pro {
+            display: grid;
+
+            grid-template-columns: 230px minmax(0,1fr);
+
+            gap: 20px;
+        }
+
+        .settings-sidebar-pro {
+            padding: 8px;
+
+            height: fit-content;
+
+            background: #181818;
+
+            border-radius: 14px;
+        }
+
+        .tab-btn-pro {
+            width: 100%;
+
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 12px 14px;
+
+            margin-bottom: 3px;
+
+            border: 0;
+            border-radius: 9px;
+
+            background: transparent;
+            color: #ccc;
+
+            text-align: right;
+        }
+
+        .tab-btn-pro:hover {
+            background: #272727;
+        }
+
+        .tab-btn-pro.active {
+            background: #303030;
+            color: white;
+        }
+
+        .tab-btn-pro.danger {
+            color: #ff7070;
+        }
+
+        .settings-content-pro {
+            min-width: 0;
+        }
+
+        .settings-pane-pro {
+            display: none;
+
+            padding: 26px;
+
+            background: #181818;
+
+            border-radius: 14px;
+        }
+
+        .settings-pane-pro.active {
+            display: block;
+        }
+
+        .settings-pane-pro h3 {
+            margin: 0 0 25px;
+
+            font-size: 20px;
+        }
+
+        .setting-row-pro {
+            min-height: 70px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 14px 0;
+
+            border-bottom: 1px solid #303030;
+        }
+
+        .setting-title-pro {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            font-weight: 700;
+        }
+
+        .setting-description-pro {
+            margin-top: 4px;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            color: #bbb;
+
+            font-size: 13px;
+        }
+
+        .form-input {
+            width: 100%;
+
+            height: 44px;
+
+            padding: 0 13px;
+
+            border: 1px solid #333;
+            border-radius: 8px;
+
+            background: #0f0f0f;
+            color: white;
+
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: #777;
+        }
+
+        .toggle {
+            position: relative;
+
+            width: 42px;
+            height: 24px;
+
+            border-radius: 20px;
+
+            background: #555;
+
+            transition: .2s;
+        }
+
+        .toggle::after {
+            content: "";
+
+            position: absolute;
+
+            top: 3px;
+            left: 3px;
+
+            width: 18px;
+            height: 18px;
+
+            border-radius: 50%;
+
+            background: white;
+
+            transition: .2s;
+        }
+
+        .toggle.active {
+            background: var(--yt-accent);
+        }
+
+        .toggle.active::after {
+            left: 21px;
+        }
+
+        .color-picker-pro {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .color-picker-pro input {
+            width: 45px;
+            height: 38px;
+
+            border: 0;
+            background: transparent;
+        }
+
+        .avatar-upload-box-pro {
+            display: flex;
+            align-items: center;
+
+            gap: 20px;
+
+            margin-bottom: 25px;
+        }
+
+        .avatar-preview-wrapper-pro {
+            width: 85px;
+            height: 85px;
+
+            display: grid;
+            place-items: center;
+
+            overflow: hidden;
+
+            border-radius: 50%;
+
+            background: #303030;
+
+            color: #aaa;
+        }
+
+        .avatar-preview-wrapper-pro img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+        }
+
+        .btn-secondary-pro,
+        .btn-danger-pro {
+            border: 0;
+            border-radius: 8px;
+
+            padding: 9px 15px;
+        }
+
+        .btn-secondary-pro {
+            background: #303030;
+            color: white;
+        }
+
+        .btn-danger-pro {
+            background: #b3261e;
+            color: white;
+        }
+
+        .danger-box-pro {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 18px;
+
+            border: 1px solid rgba(255,0,51,.25);
+            border-radius: 10px;
+
+            background: rgba(255,0,51,.05);
+        }
+
+        /* =====================================================
+           SAVE BAR
+        ====================================================== */
+
+        #settingsSaveBar {
+            position: fixed;
+
+            left: 50%;
+            bottom: 22px;
+
+            transform: translate(-50%, 130px);
+
+            z-index: 2000;
+
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            padding: 10px 12px 10px 18px;
+
+            background: #272727;
+
+            border: 1px solid #444;
+            border-radius: 12px;
+
+            box-shadow: 0 8px 30px rgba(0,0,0,.45);
+
+            transition: transform .25s ease;
+        }
+
+        #settingsSaveBar.show {
+            transform: translate(-50%, 0);
+        }
+
+        #settingsSaveBar span {
+            color: #ddd;
+            font-size: 13px;
+        }
+
+        .save-btn-pro,
+        .discard-btn-pro {
+            border: 0;
+            border-radius: 7px;
+
+            padding: 8px 15px;
+
+            font-weight: 700;
+        }
+
+        .save-btn-pro {
+            background: white;
+            color: black;
+        }
+
+        .discard-btn-pro {
+            background: transparent;
+            color: #ddd;
+        }
+
+        /* =====================================================
+           VIDEO PAGE
+        ====================================================== */
+
+        .video-page-container {
+            display: grid;
+
+            grid-template-columns: minmax(0,1fr) 330px;
+
+            gap: 24px;
+
+            max-width: 1400px;
+
+            margin: auto;
+        }
+
+        .video-player-large {
+            width: 100%;
+
+            aspect-ratio: 16 / 9;
+
+            border-radius: 12px;
+
+            overflow: hidden;
+
+            background: #000;
+        }
+
+        .video-player-large iframe {
+            width: 100%;
+            height: 100%;
+
+            border: 0;
+        }
+
+        .video-title-large {
+            margin: 18px 0 12px;
+
+            font-size: 22px;
+            line-height: 1.5;
+        }
+
+        .channel-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            padding-bottom: 15px;
+
+            border-bottom: 1px solid #303030;
+        }
+
+        .channel-info {
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+        }
+
+        .channel-avatar {
+            width: 44px;
+            height: 44px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 50%;
+
+            background: #303030;
+        }
+
+        .channel-info h3 {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .channel-info p {
+            margin: 2px 0 0;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .subscribe-btn {
+            border: 0;
+            border-radius: 20px;
+
+            padding: 8px 15px;
+
+            background: white;
+            color: black;
+
+            font-weight: 700;
+        }
+
+        .video-description {
+            margin-top: 15px;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            background: #272727;
+
+            color: #ddd;
+
+            line-height: 1.8;
+        }
+
+        .related-videos h3 {
+            margin-top: 0;
+        }
+
+        .back-btn {
+            border: 0;
+            border-radius: 8px;
+
+            padding: 8px 14px;
+            margin-bottom: 15px;
+
+            background: #272727;
+            color: white;
+        }
+
+        /* =====================================================
+           MOBILE
+        ====================================================== */
+
+        .side-backdrop {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+
+            :root {
+                --yt-sidebar: 0px;
+            }
+
+            .hdr-left {
+                min-width: auto;
+            }
+
+            .logo-t {
+                display: none;
+            }
+
+            .hdr-right {
+                min-width: auto;
+            }
+
+            .search-wrap {
+                padding: 0 8px;
+            }
+
+            .search-inner {
+                max-width: 100%;
+            }
+
+            .side {
+                width: 270px;
+
+                transform: translateX(-110%);
+
+                transition: transform .25s ease;
+
+                box-shadow: 10px 0 30px rgba(0,0,0,.4);
+            }
+
+            .side.show {
+                transform: translateX(0);
+            }
+
+            .side-backdrop.show {
+                display: block;
+
+                position: fixed;
+                inset: var(--yt-header) 0 0 0;
+
+                z-index: 850;
+
+                background: rgba(0,0,0,.65);
+            }
+
+            .main {
+                width: 100% !important;
+
+                margin-left: 0 !important;
+
+                padding: 15px 12px 40px;
+            }
+
+            .grid,
+            .yt-grid {
+                grid-template-columns:
+                    repeat(
+                        auto-fill,
+                        minmax(190px,1fr)
+                    );
+
+                gap: 20px 12px;
+            }
+
+            .hero {
+                padding: 25px 20px;
+            }
+
+            .settings-layout-pro {
+                grid-template-columns: 1fr;
+            }
+
+            .settings-sidebar-pro {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .video-page-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 560px) {
+
+            .hdr {
+                padding: 0 8px;
+            }
+
+            .hdr-left {
+                gap: 5px;
+            }
+
+            .search-wrap {
+                padding: 0 4px;
+            }
+
+            .icon-btn {
+                width: 36px;
+                height: 36px;
+            }
+
+            .grid,
+            .yt-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-stats {
+                gap: 20px;
+            }
+
+            .settings-pane-pro {
+                padding: 18px;
+            }
+
+            #settingsSaveBar {
+                width: calc(100% - 24px);
+
+                justify-content: space-between;
+            }
+        }
+
+        /* =====================================================
+           LIGHT THEME
+        ====================================================== */
+
+        html[data-theme="light"] {
+            --yt-bg: #fff;
+            --yt-surface: #f5f5f5;
+            --yt-surface-2: #eee;
+            --yt-hover: #e5e5e5;
+            --yt-text: #0f0f0f;
+            --yt-muted: #606060;
+        }
+
+        html[data-theme="light"] body,
+        html[data-theme="light"] .app-container,
+        html[data-theme="light"] .hdr,
+        html[data-theme="light"] .side {
+            background: #fff;
+            color: #0f0f0f;
+        }
+
+        html[data-theme="light"] .search-inner {
+            background: #fff;
+            border-color: #ccc;
+        }
+
+        html[data-theme="light"] #searchInput {
+            color: #111;
+        }
+
+        html[data-theme="light"] .yt-chip {
+            background: #eee;
+            color: #111;
+        }
+
+        html[data-theme="light"] .yt-chip.active {
+            background: #111;
+            color: white;
+        }
+
+        html[data-theme="light"] .hero,
+        html[data-theme="light"] .settings-sidebar-pro,
+        html[data-theme="light"] .settings-pane-pro {
+            background: #f5f5f5;
+        }
+
+        html[data-theme="light"] .yt-card-title,
+        html[data-theme="light"] .logo-t {
+            color: #111;
+        }
+
+        html[data-theme="light"] .yt-card-channel,
+        html[data-theme="light"] .yt-card-meta,
+        html[data-theme="light"] .hero p {
+            color: #606060;
+        }
+
+        /* =====================================================
+           COMPACT MODE
+        ====================================================== */
+
+        html.compact-mode .grid,
+        html.compact-mode .yt-grid {
+            row-gap: 18px;
+        }
+
+        html.compact-mode .yt-card-info {
+            padding-top: 6px;
+        }
+
+        html.compact-mode .yt-card-title {
+            font-size: 13px;
+        }
+
+        html.reduce-motion *,
+        html.reduce-motion *::before,
+        html.reduce-motion *::after {
+            animation-duration: .001ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: .001ms !important;
+            scroll-behavior: auto !important;
+        }
+
+    </style>
 </head>
+
 <body class="yt-dark-theme">
 
-    <div class="app-container">
-        
-        <!-- ========================================== -->
-        <!-- 1. TOP HEADER (YouTube Clone B)            -->
-        <!-- ========================================== -->
-        <header class="yt-header">
-            <div class="yt-header-left">
-                <button class="yt-icon-btn" id="menuToggleBtn" onclick="toggleSidebar()" aria-label="القائمة">
-                    <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M21 6H3V5h18v1zM21 12H3v-1h18v1zm0 6H3v-1h18v1z"/></svg>
-                </button>
-                <div class="yt-logo" onclick="navigate('home')">
-                    <span class="yt-logo-red">🇹🇳</span>
-                    <span class="yt-logo-text">Tunisian<span>Tube</span></span>
-                </div>
+<div class="app-container">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="hdr yt-header">
+
+        <div class="hdr-left">
+
+            <button
+                class="menu-i"
+                onclick="toggleSidebar()"
+                aria-label="فتح القائمة"
+            >
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <div
+                class="logo-wrap"
+                onclick="navigate('home')"
+                role="button"
+                tabindex="0"
+            >
+                <img
+                    src="logo.png"
+                    alt="TunisianTube"
+                    class="logo-img"
+                    onerror="this.style.display='none'"
+                >
+
+                <span class="logo-t">
+                    Tunisian<span class="logo-r">Tube</span>
+                </span>
             </div>
 
-            <div class="yt-header-center">
-                <form class="yt-search-pill" onsubmit="event.preventDefault(); navigate('home');">
-                    <input type="text" id="searchInput" placeholder="لوّج على دورة، برمجة، لغة..." oninput="onSearchInput()">
-                    <button type="submit" class="yt-search-btn" aria-label="بحث">
-                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
-                    </button>
-                </form>
-            </div>
-
-            <div class="yt-header-right">
-                <button class="yt-icon-btn" onclick="forceToggleTheme()" id="themeBtn" aria-label="الوضع الليلي">
-                    <i class="fa-solid fa-moon"></i>
-                </button>
-                
-                <!-- زر الدخول (يظهر لغير المسجلين) -->
-                <button class="yt-auth-btn" id="headerAuthBtn" onclick="openAuth()">
-                    <i class="far fa-user-circle"></i> دخول
-                </button>
-                
-                <!-- بروفايل المستخدم (يظهر للمسجلين) -->
-                <div class="yt-user-menu" id="userMenuArea" style="display: none;">
-                    <div class="yt-avatar-header" onclick="toggleDropdown()">
-                        <img id="headerAvatar" src="https://img.icons8.com/color/96/user.png" alt="avatar">
-                    </div>
-                    
-                    <!-- Dropdown -->
-                    <div class="yt-dropdown" id="dropdown">
-                        <div class="yt-dropdown-header">
-                            <div class="dd-avatar" id="ddAvatar"><img src="https://img.icons8.com/color/96/user.png" alt="av"></div>
-                            <div class="yt-dropdown-info">
-                                <span id="ddName">اسم المستخدم</span>
-                                <span id="ddEmail">الايميل</span>
-                            </div>
-                        </div>
-                        <div class="yt-dropdown-divider"></div>
-                        <button class="yt-dropdown-item" onclick="forceGoSettings('channel')"><i class="fa-solid fa-tv"></i> قناتي</button>
-                        <button class="yt-dropdown-item" onclick="forceGoSettings('account')"><i class="fa-solid fa-user-gear"></i> الإعدادات</button>
-                        <div class="yt-dropdown-divider"></div>
-                        <button class="yt-dropdown-item" onclick="navigate('liked')"><i class="fa-solid fa-heart"></i> إعجابات</button>
-                        <button class="yt-dropdown-item" onclick="navigate('history')"><i class="fa-solid fa-clock-rotate-left"></i> السجل</button>
-                        <div class="yt-dropdown-divider"></div>
-                        <button class="yt-dropdown-item logout" onclick="logOut()"><i class="fa-solid fa-right-from-bracket"></i> خروج</button>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- ========================================== -->
-        <!-- 2. MAIN LAYOUT (YouTube Clone B)           -->
-        <!-- ========================================== -->
-        <div class="yt-layout">
-            
-            <!-- SIDEBAR -->
-            <div class="side-backdrop" onclick="toggleSidebar()"></div>
-            <aside class="yt-sidebar" id="sidebar">
-                <div id="catList">
-                    <!-- يتم بناؤه ديناميكيًا من ui.js -->
-                </div>
-                <div id="subList">
-                    <!-- يتم بناؤه ديناميكيًا من ui.js -->
-                </div>
-            </aside>
-
-            <!-- MAIN CONTENT -->
-            <main class="yt-main" id="mainContent">
-                
-                <!-- ================= الصفحة الرئيسية ================= -->
-                <div id="homePage" class="page active">
-                    <!-- شريط الفلاتر (YouTube Chips) -->
-                    <div class="yt-chips-container" id="filterBar"></div>
-                    
-                    <!-- Grid الفيديوهات -->
-                    <div class="yt-grid" id="grid"></div>
-                    <div id="sentinel"></div>
-                    <div class="yt-empty" id="empty" style="display: none;">
-                        <i class="fa-solid fa-magnifying-glass" style="font-size:48px; color:var(--text3); margin-bottom:16px;"></i>
-                        <h2>ما فما حتى فيديو 🇹🇳</h2>
-                        <p>جرّب تبدّل الفلتر ولا البحث</p>
-                    </div>
-                </div>
-
-                <!-- ================= صفحة الإعدادات Pro ================= -->
-                <div id="settingsPage" class="page">
-                    <div class="settings-container-pro">
-                        <div class="settings-header-pro">
-                            <h2><i class="fa-solid fa-gear"></i> إعدادات المنصة</h2>
-                            <p>تحكم في مظهر الموقع، حسابك، وتفضيلاتك بكل سهولة.</p>
-                        </div>
-                        
-                        <div class="settings-layout-pro">
-                            <!-- القائمة الجانبية للإعدادات -->
-                            <aside class="settings-sidebar-pro">
-                                <button class="tab-btn-pro active" data-tab="account" onclick="forceOpenSettingsTab('account', this)"><i class="fa-solid fa-circle-user"></i> حسابي</button>
-                                <button class="tab-btn-pro" data-tab="appearance" onclick="forceOpenSettingsTab('appearance', this)"><i class="fa-solid fa-paint-roller"></i> المظهر</button>
-                                <button class="tab-btn-pro" data-tab="player" onclick="forceOpenSettingsTab('player', this)"><i class="fa-solid fa-circle-play"></i> مشغل الفيديو</button>
-                                <button class="tab-btn-pro danger" data-tab="privacy" onclick="forceOpenSettingsTab('privacy', this)"><i class="fa-solid fa-shield-halved"></i> الخصوصية</button>
-                            </aside>
-
-                            <!-- محتوى الإعدادات -->
-                            <main class="settings-content-pro">
-                                
-                                <!-- حسابي -->
-                                <div id="set-pro-account" class="settings-pane-pro active">
-                                    <h3><i class="fa-solid fa-user-gear"></i> معلومات الحساب</h3>
-                                    <div class="avatar-upload-box-pro">
-                                        <div class="avatar-preview-wrapper-pro" id="accAvatarWrapPro"><i class="fa-solid fa-camera"></i></div>
-                                        <div class="avatar-actions-pro">
-                                            <label class="btn-secondary-pro" for="accPicInputPro"><i class="fa-solid fa-upload"></i> بدّل التصويرة</label>
-                                            <input type="file" id="accPicInputPro" accept="image/*" style="display:none" onchange="forceAvatarChange(event)">
-                                        </div>
-                                    </div>
-                                    <div class="settings-grid-2">
-                                        <div class="form-group">
-                                            <label class="form-label">الاسم الكامل</label>
-                                            <input class="form-input" id="accNamePro" placeholder="مثال: يوسف التونسي">
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">المعرّف (Handle)</label>
-                                            <input class="form-input" id="accHandlePro" placeholder="@youssef_tn">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- المظهر -->
-                                <div id="set-pro-appearance" class="settings-pane-pro">
-                                    <h3><i class="fa-solid fa-paint-roller"></i> تخصيص المظهر</h3>
-                                    <div class="setting-row-pro">
-                                        <div><div class="setting-title-pro"><i class="fa-solid fa-moon"></i> الوضع الليلي</div><div class="setting-desc-pro">يريح العينين في الليل</div></div>
-                                        <div class="toggle" id="t-pro-dark" onclick="toggleSetPro('theme')"></div>
-                                    </div>
-                                    <div class="setting-row-pro" style="flex-direction: column; align-items: flex-start;">
-                                        <div><div class="setting-title-pro"><i class="fa-solid fa-palette"></i> لون المنصة</div><div class="setting-desc-pro">اختار اللون اللي يعجبك للمنصة</div></div>
-                                        <div class="color-picker-pro">
-                                            <div class="color-dot active" style="background:#ff0000;" onclick="changeThemeColor('#ff0000', this)"></div> <!-- يوتيوب -->
-                                            <div class="color-dot" style="background:#e11a24;" onclick="changeThemeColor('#e11a24', this)"></div> <!-- تونس -->
-                                            <div class="color-dot" style="background:#3b82f6;" onclick="changeThemeColor('#3b82f6', this)"></div> <!-- أزرق -->
-                                            <div class="color-dot" style="background:#10b981;" onclick="changeThemeColor('#10b981', this)"></div> <!-- أخضر -->
-                                        </div>
-                                    </div>
-                                    <div class="setting-row-pro">
-                                        <div><div class="setting-title-pro"><i class="fa-solid fa-compress"></i> الوضع المضغوط</div><div class="setting-desc-pro">تصغير حجم الكروت</div></div>
-                                        <div class="toggle" id="t-pro-compact" onclick="toggleSetPro('compactMode')"></div>
-                                    </div>
-                                </div>
-
-                                <!-- المشغل -->
-                                <div id="set-pro-player" class="settings-pane-pro">
-                                    <h3><i class="fa-solid fa-circle-play"></i> إعدادات الفيديو</h3>
-                                    <div class="setting-row-pro">
-                                        <div><div class="setting-title-pro"><i class="fa-solid fa-play"></i> التشغيل التلقائي</div></div>
-                                        <div class="toggle" id="t-pro-autoplay" onclick="toggleSetPro('autoplay')"></div>
-                                    </div>
-                                    <div class="form-group" style="margin-top:20px">
-                                        <label class="form-label"><i class="fa-solid fa-display"></i> الجودة الافتراضية</label>
-                                        <select class="form-select" id="prefQualityPro"><option value="auto">Auto</option><option value="1080p">1080p</option><option value="720p">720p</option></select>
-                                    </div>
-                                </div>
-
-                                <!-- الخصوصية -->
-                                <div id="set-pro-privacy" class="settings-pane-pro">
-                                    <h3><i class="fa-solid fa-shield-halved"></i> الخصوصية والأمان</h3>
-                                    <div class="danger-box-pro">
-                                        <div><h4>فسخ السجل</h4><p>تمسح الفيديوهات اللي تفرجت فاها</p></div>
-                                        <button class="btn-danger-pro" onclick="clearHistoryPro()">فسخ</button>
-                                    </div>
-                                    <div class="danger-box-pro">
-                                        <div><h4>إعادة ضبط المصنع</h4><p>يرجع الموقع كيف ما تحل أول مرة</p></div>
-                                        <button class="btn-danger-extreme-pro" onclick="resetAllAppDataPro()">إعادة ضبط</button>
-                                    </div>
-                                </div>
-
-                            </main>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ================= صفحات أخرى ================= -->
-                <div id="videoPage" class="page"><div id="videoPlayerContainer"></div></div>
-                <div id="categoryPage" class="page"><div class="yt-grid" id="categoryGrid"></div></div>
-                <div id="likedPage" class="page"><div class="yt-page-header"><h2>فيديوهات أعجبتني</h2></div><div class="yt-grid" id="likedGrid"></div></div>
-                <div id="subscriptionsPage" class="page"><div class="yt-page-header"><h2>الاشتراكات</h2></div><div class="yt-grid" id="subsGrid"></div></div>
-                <div id="historyPage" class="page"><div class="yt-page-header"><h2>سجل المشاهدة</h2></div><div class="yt-grid" id="historyGrid"></div></div>
-
-            </main>
         </div>
+
+        <div class="search-wrap">
+
+            <form
+                class="search-inner"
+                onsubmit="event.preventDefault(); onSearchSubmit();"
+                role="search"
+            >
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="لوّج على دورة..."
+                    oninput="onSearchInput()"
+                    autocomplete="off"
+                >
+
+                <button
+                    type="submit"
+                    class="search-btn"
+                    aria-label="البحث"
+                >
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="hdr-right">
+
+            <span
+                class="vid-count"
+                id="vCount"
+            >
+                0 دورة
+            </span>
+
+            <button
+                class="icon-btn"
+                id="themeBtn"
+                onclick="forceToggleTheme()"
+                aria-label="تبديل الوضع"
+            >
+                <i class="fa-solid fa-sun"></i>
+            </button>
+
+            <button
+                class="icon-btn"
+                onclick="navigate('settings')"
+                aria-label="الإعدادات"
+            >
+                <i class="fa-solid fa-gear"></i>
+            </button>
+
+            <div id="authArea"></div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         ACCOUNT DROPDOWN
+    ====================================================== -->
+
+    <div
+        class="dropdown"
+        id="dropdown"
+        role="menu"
+        aria-hidden="true"
+    >
+
+        <div class="dd-header">
+
+            <div
+                class="dd-avatar"
+                id="ddAvatar"
+            >
+                U
+            </div>
+
+            <div>
+
+                <div
+                    class="dd-name"
+                    id="ddName"
+                >
+                    User
+                </div>
+
+                <div
+                    class="dd-email"
+                    id="ddEmail"
+                ></div>
+
+            </div>
+
+        </div>
+
+        <div class="dd-sep"></div>
+
+        <div
+            class="dd-item"
+            onclick="forceGoSettings('channel')"
+        >
+            <i class="fa-solid fa-tv"></i>
+            <span>قناتي</span>
+        </div>
+
+        <div
+            class="dd-item"
+            onclick="forceGoSettings('profile')"
+        >
+            <i class="fa-solid fa-user"></i>
+            <span>حسابي</span>
+        </div>
+
+        <div
+            class="dd-item"
+            onclick="navigate('settings')"
+        >
+            <i class="fa-solid fa-gear"></i>
+            <span>الإعدادات</span>
+        </div>
+
+        <div class="dd-sep"></div>
+
+        <div
+            class="dd-item"
+            onclick="navigate('liked')"
+        >
+            <i class="fa-solid fa-heart"></i>
+            <span>فيديوهات عجبتني</span>
+        </div>
+
+        <div
+            class="dd-item"
+            onclick="navigate('subscriptions')"
+        >
+            <i class="fa-solid fa-bell"></i>
+            <span>الاشتراكات</span>
+        </div>
+
+        <div
+            class="dd-item"
+            onclick="navigate('history')"
+        >
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span>السجل</span>
+        </div>
+
+        <div class="dd-sep"></div>
+
+        <div
+            class="dd-item danger"
+            onclick="logOut()"
+        >
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>خروج</span>
+        </div>
+
     </div>
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-    <!-- Scripts (B) -->
-    <script src="data.js"></script>
-    <script src="globals.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="utils.js"></script>
-    <script src="auth.js"></script>
-    <script src="settings.js"></script>
-    <script src="social.js"></script>
-    <script src="video.js"></script>
-    <script src="ui.js"></script>
-    <script src="router.js"></script>
-    <script src="main.js"></script>
+    <!-- =====================================================
+         LAYOUT
+    ====================================================== -->
+
+    <div class="layout">
+
+        <div
+            class="side-backdrop"
+            onclick="closeMobileSidebar()"
+        ></div>
+
+
+        <!-- =================================================
+             LEFT SIDEBAR
+        ================================================== -->
+
+        <aside
+            class="side yt-sidebar"
+            id="sidebar"
+            aria-label="القائمة الجانبية"
+        >
+
+            <div id="catList"></div>
+
+            <div id="subList"></div>
+
+        </aside>
+
+
+        <!-- =================================================
+             MAIN
+        ================================================== -->
+
+        <main
+            class="main yt-main"
+            id="mainContent"
+        >
+
+            <!-- =================================================
+                 HOME
+            ================================================== -->
+
+            <div
+                class="page active"
+                id="page-home"
+            >
+
+                <section
+                    class="hero"
+                    id="hero"
+                >
+
+                    <span class="hero-kicker">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        المنصة التونسية للتعلّم
+                    </span>
+
+                    <h1>
+                        تعلّم حاجة
+                        <span class="grad">
+                            جديدة كل يوم
+                        </span>
+                        <br>
+                        <span class="ar">
+                            بالدارجة التونسية 🇹🇳
+                        </span>
+                    </h1>
+
+                    <p>
+                        كورسات بلاش في البرمجة، التصميم، اللغات،
+                        التسويق وأكثر. اختار الحاجة اللي تحب تتعلمها
+                        وابدا توّا.
+                    </p>
+
+                    <div class="hero-cta">
+
+                        <button
+                            class="hero-btn primary"
+                            onclick="document.getElementById('grid').scrollIntoView({behavior:'smooth'})"
+                        >
+                            <i class="fa-solid fa-play"></i>
+                            ابدا تقرا توّا
+                        </button>
+
+                        <button
+                            class="hero-btn ghost"
+                            onclick="navigate('settings')"
+                        >
+                            <i class="fa-solid fa-sliders"></i>
+                            الإعدادات
+                        </button>
+
+                    </div>
+
+                    <div class="hero-stats">
+
+                        <div class="hstat">
+                            <b id="statV">0</b>
+                            <span>دورة</span>
+                        </div>
+
+                        <div class="hstat">
+                            <b id="statC">0</b>
+                            <span>تصنيفات</span>
+                        </div>
+
+                        <div class="hstat">
+                            <b>100%</b>
+                            <span>بلاش</span>
+                        </div>
+
+                        <div class="hstat">
+                            <b id="statH">+1500h</b>
+                            <span>ساعات قراية</span>
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <div
+                    class="filter-bar"
+                    id="filterBar"
+                ></div>
+
+
+                <div
+                    class="grid yt-grid"
+                    id="grid"
+                ></div>
+
+
+                <div id="sentinel"></div>
+
+
+                <div
+                    class="empty-state"
+                    id="empty"
+                    style="display:none"
+                ></div>
+
+            </div>
+
+
+            <!-- =================================================
+                 VIDEO
+            ================================================== -->
+
+            <div
+                class="page"
+                id="page-video"
+            >
+
+                <button
+                    class="back-btn"
+                    onclick="navigate('home')"
+                >
+                    <i class="fa-solid fa-arrow-right"></i>
+                    رجوع
+                </button>
+
+                <div class="video-page-container">
+
+                    <div class="video-main">
+
+                        <div
+                            class="video-player-large"
+                            id="playerLarge"
+                        ></div>
+
+                        <div class="video-info-large">
+
+                            <h1
+                                class="video-title-large"
+                                id="mTitleLarge"
+                            ></h1>
+
+                            <div class="channel-row">
+
+                                <div class="channel-info">
+
+                                    <div
+                                        class="channel-avatar"
+                                        id="mChanAvatar"
+                                    >
+                                        C
+                                    </div>
+
+                                    <div>
+
+                                        <h3 id="mChanLarge">
+                                            Channel
+                                        </h3>
+
+                                        <p id="mCatLarge"></p>
+
+                                    </div>
+
+                                    <button
+                                        class="subscribe-btn"
+                                        id="subscribeBtn"
+                                        onclick="toggleSubFromPage()"
+                                    >
+                                        <i class="fa-solid fa-bell"></i>
+                                        <span>إشتراك</span>
+                                    </button>
+
+                                </div>
+
+                                <div
+                                    class="video-actions-row"
+                                    id="mActionsLarge"
+                                ></div>
+
+                            </div>
+
+                            <div
+                                class="video-description"
+                                id="mDescLarge"
+                            ></div>
+
+                            <div
+                                class="comments-large"
+                                id="cmtSectionLarge"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+                    <aside class="related-videos">
+
+                        <h3>
+                            <i class="fa-solid fa-tv"></i>
+                            فيديوهات مشابهة
+                        </h3>
+
+                        <div id="relatedList"></div>
+
+                    </aside>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 SETTINGS
+            ================================================== -->
+
+            <div
+                class="page"
+                id="page-settings"
+            >
+
+                <button
+                    class="back-btn"
+                    onclick="navigate('home')"
+                >
+                    <i class="fa-solid fa-arrow-right"></i>
+                    رجوع
+                </button>
+
+
+                <div class="settings-container-pro">
+
+                    <div class="settings-header-pro">
+
+                        <h2>
+                            <i class="fa-solid fa-gear"></i>
+                            الإعدادات
+                        </h2>
+
+                        <p>
+                            تحكم في حسابك وتجربتك في TunisianTube.
+                        </p>
+
+                    </div>
+
+
+                    <div class="settings-layout-pro">
+
+                        <!-- SETTINGS SIDEBAR -->
+
+                        <aside
+                            class="settings-sidebar-pro"
+                            aria-label="أقسام الإعدادات"
+                        >
+
+                            <button
+                                class="tab-btn-pro active"
+                                data-tab="profile"
+                                onclick="forceOpenSettingsTab('profile',this)"
+                            >
+                                <i class="fa-solid fa-circle-user"></i>
+                                حسابي
+                            </button>
+
+                            <button
+                                class="tab-btn-pro"
+                                data-tab="appearance"
+                                onclick="forceOpenSettingsTab('appearance',this)"
+                            >
+                                <i class="fa-solid fa-palette"></i>
+                                المظهر
+                            </button>
+
+                            <button
+                                class="tab-btn-pro"
+                                data-tab="player"
+                                onclick="forceOpenSettingsTab('player',this)"
+                            >
+                                <i class="fa-solid fa-play"></i>
+                                مشغل الفيديو
+                            </button>
+
+                            <button
+                                class="tab-btn-pro"
+                                data-tab="notifications"
+                                onclick="forceOpenSettingsTab('notifications',this)"
+                            >
+                                <i class="fa-solid fa-bell"></i>
+                                الإشعارات
+                            </button>
+
+                            <button
+                                class="tab-btn-pro"
+                                data-tab="privacy"
+                                onclick="forceOpenSettingsTab('privacy',this)"
+                            >
+                                <i class="fa-solid fa-shield-halved"></i>
+                                الخصوصية
+                            </button>
+
+                            <button
+                                class="tab-btn-pro"
+                                data-tab="advanced"
+                                onclick="forceOpenSettingsTab('advanced',this)"
+                            >
+                                <i class="fa-solid fa-sliders"></i>
+                                متقدم
+                            </button>
+
+                        </aside>
+
+
+                        <!-- SETTINGS CONTENT -->
+
+                        <main class="settings-content-pro">
+
+
+                            <!-- PROFILE -->
+
+                            <div
+                                id="set-pro-profile"
+                                class="settings-pane-pro active"
+                            >
+
+                                <h3>
+                                    <i class="fa-solid fa-user"></i>
+                                    معلومات الحساب
+                                </h3>
+
+                                <div class="avatar-upload-box-pro">
+
+                                    <div
+                                        class="avatar-preview-wrapper-pro"
+                                        id="accAvatarWrapPro"
+                                    >
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+
+                                    <div class="avatar-actions-pro">
+
+                                        <label
+                                            class="btn-secondary-pro"
+                                            for="accPicInputPro"
+                                        >
+                                            <i class="fa-solid fa-upload"></i>
+                                            بدّل التصويرة
+                                        </label>
+
+                                        <input
+                                            type="file"
+                                            id="accPicInputPro"
+                                            accept="image/*"
+                                            hidden
+                                            onchange="forceAvatarChange(event)"
+                                        >
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label
+                                        class="form-label"
+                                        for="accNamePro"
+                                    >
+                                        الاسم
+                                    </label>
+
+                                    <input
+                                        class="form-input"
+                                        id="accNamePro"
+                                        type="text"
+                                    >
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label
+                                        class="form-label"
+                                        for="accEmailPro"
+                                    >
+                                        الإيميل
+                                    </label>
+
+                                    <input
+                                        class="form-input"
+                                        id="accEmailPro"
+                                        type="email"
+                                        disabled
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- APPEARANCE -->
+
+                            <div
+                                id="set-pro-appearance"
+                                class="settings-pane-pro"
+                            >
+
+                                <h3>
+                                    <i class="fa-solid fa-palette"></i>
+                                    المظهر
+                                </h3>
+
+
+                                <div class="setting-row-pro">
+
+                                    <div>
+
+                                        <div class="setting-title-pro">
+                                            <i class="fa-solid fa-moon"></i>
+                                            الوضع الليلي
+                                        </div>
+
+                                        <div class="setting-description-pro">
+                                            بدّل بين الوضع الليلي والنهاري.
+                                        </div>
+
+                                    </div>
+
+                                    <div
+                                        class="toggle"
+                                        id="t-pro-dark"
+                                        onclick="toggleDraftSetting('theme')"
+                                        role="switch"
+                                    ></div>
+
+                                </div>
+
+
+                                <div class="setting-row-pro">
+
+                                    <div>
+
+                                        <div class="setting-title-pro">
+                                            <i class="fa-solid fa-compress"></i>
+                                            الوضع المختصر
+                                        </div>
+
+                                        <div class="setting-description-pro">
+                                            نقص شوية من المسافات في الواجهة.
+                                        </div>
+
+                                    </div>
+
+                                    <div
+                                        class="toggle"
+                                        id="t-pro-compact"
+                                        onclick="toggleDraftSetting('compact')"
+                                    ></div>
+
+                                </div>
+
+
+                                <div class="setting-row-pro">
+
+                                    <div>
+
+                                        <div class="setting-title-pro">
+                                            <i class="fa-solid fa-bolt"></i>
+                                            لون الواجهة
+                                        </div>
+
+                                    </div>
+
+                                    <div class="color-picker-pro">
+
+                                        <input
+                                            type="color"
+                                            id="accentColorPro"
+                                            value="#ff0033"
+                                            onchange="updateDraftSetting('accent',this.value)"
+                                        >
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- PLAYER -->
+
+                            <div
+                                id="set-pro-player"
+                                class="settings-pane-pro"
+                            >
+
+                                <h3>
+                                    <i class="fa-solid fa-play"></i>
+                                    مشغل الفيديو
+                                </h3>
+
+
+                                <div class="setting-row-pro">
+
+                                    <div>
+
+                                        <div class="setting-title-pro">
+                                            التشغيل التلقائي
+                                        </div>
+
+                                        <div class="setting-description-pro">
+                                            الفيديو التالي يبدأ وحدو.
+                                        </div>
+
+                                    </div>
+
+                                    <div
+                                        class="toggle"
+                                        id="t-pro-autoplay"
+                                        onclick="toggleDraftSetting('autoplay')"
+                                    ></div>
+
+                                </div>
+
+
+                                <div class="setting-row-pro">
+
+                                    <div>
+
+                                        <div class="setting-title-pro">
+                                            توفير البيانات
+                                        </div>
+
+                                        <div class="setting-description-pro">
+                                            نقص استهلاك الإنترنت.
+                                        </div>
+
+                                    </div>
+
+                                    <div
+                                        class="toggle"
+                                        id="t-pro-dataSaver"
+                                        onclick="toggleDraftSetting('dataSaver')"
+                                    ></div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- NOTIFICATIONS -->
+
+                            <div
+                                id="set-pro-notifications"
+                                class="settings-pane-pro"
+                            >
+
+                                <h3>
+                                    <i class="fa-solid fa-bell"></i>
+                                    الإشعارات
+                                </h3>
+
+
+                                <div class="setting-row-pro">
+
+                                    <div>
+
+                                        <div class="setting-title-pro">
+                                            إشعارات القنوات
+                                        </div>
+
+                                        <div class="setting-description-pro">
+                                            توصلك التنبيهات متاع القنوات اللي تابعهم.
+                                        </div>
+
+                                    </div>
+
+                                    <div
+                                        class="toggle"
+                                        id="t-pro-notifications"
+                                        onclick="toggleDraftSetting('notifications')"
+                                    ></div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- PRIVACY -->
+
+                            <div
+                                id="set-pro-privacy"
+                                class="settings-pane-pro"
+                            >
+
+                                <h3>
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                    الخصوصية
+                                </h3>
+
+
+                                <div class="setting-row-pro">
+
+                                    <div>
+
+                                        <div class="setting-title-pro">
+                                            حفظ السجل
+                                        </div>
+
+                                        <div class="setting-description-pro">
+                                            خلّي TunisianTube يحفظ الفيديوهات اللي شفتهم.
+                                        </div>
+
+                                    </div>
+
+                                    <div
+                                        class="toggle"
+                                        id="t-pro-history"
+                                        onclick="toggleDraftSetting('history')"
+                                    ></div>
+
+                                </div>
+
+
+                                <div class="danger-box-pro">
+
+                                    <div>
+
+                                        <h4>
+                                            فسخ السجل
+                                        </h4>
+
+                                        <p>
+                                            يفسخ الفيديوهات الموجودة في السجل.
+                                        </p>
+
+                                    </div>
+
+                                    <button
+                                        class="btn-danger-pro"
+                                        onclick="clearHistoryPro()"
+                                    >
+                                        فسخ
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ADVANCED -->
+
+                            <div
+                                id="set-pro-advanced"
+                                class="settings-pane-pro"
+                            >
+
+                                <h3>
+                                    <i class="fa-solid fa-sliders"></i>
+                                    إعدادات متقدمة
+                                </h3>
+
+
+                                <div class="setting-row-pro">
+
+                                    <div>
+
+                                        <div class="setting-title-pro">
+                                            نقص الحركات
+                                        </div>
+
+                                        <div class="setting-description-pro">
+                                            يقلل الأنيميشنات في الموقع.
+                                        </div>
+
+                                    </div>
+
+                                    <div
+                                        class="toggle"
+                                        id="t-pro-motion"
+                                        onclick="toggleDraftSetting('reduceMotion')"
+                                    ></div>
+
+                                </div>
+
+
+                                <div class="setting-row-pro">
+
+                                    <div>
+
+                                        <div class="setting-title-pro">
+                                            مسح الإعدادات المحلية
+                                        </div>
+
+                                        <div class="setting-description-pro">
+                                            يرجّع إعدادات TunisianTube للوضع الأصلي.
+                                        </div>
+
+                                    </div>
+
+                                    <button
+                                        class="btn-danger-pro"
+                                        onclick="resetSettingsPro()"
+                                    >
+                                        Reset
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </main>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 LIKED
+            ================================================== -->
+
+            <div
+                class="page"
+                id="page-liked"
+            >
+
+                <button
+                    class="back-btn"
+                    onclick="navigate('home')"
+                >
+                    <i class="fa-solid fa-arrow-right"></i>
+                    رجوع
+                </button>
+
+                <h2>الفيديوهات اللي عجبتك ❤️</h2>
+
+                <div
+                    class="grid yt-grid"
+                    id="likedGrid"
+                ></div>
+
+            </div>
+
+
+            <!-- =================================================
+                 SUBSCRIPTIONS
+            ================================================== -->
+
+            <div
+                class="page"
+                id="page-subscriptions"
+            >
+
+                <button
+                    class="back-btn"
+                    onclick="navigate('home')"
+                >
+                    <i class="fa-solid fa-arrow-right"></i>
+                    رجوع
+                </button>
+
+                <h2>الاشتراكات 🔔</h2>
+
+                <div
+                    class="grid yt-grid"
+                    id="subsGrid"
+                ></div>
+
+            </div>
+
+
+            <!-- =================================================
+                 HISTORY
+            ================================================== -->
+
+            <div
+                class="page"
+                id="page-history"
+            >
+
+                <button
+                    class="back-btn"
+                    onclick="navigate('home')"
+                >
+                    <i class="fa-solid fa-arrow-right"></i>
+                    رجوع
+                </button>
+
+                <h2>السجل 🕘</h2>
+
+                <div
+                    class="grid yt-grid"
+                    id="historyGrid"
+                ></div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     SAVE BAR
+========================================================= -->
+
+<div id="settingsSaveBar">
+
+    <span>
+        عندك تغييرات مازال ما تحفّظتش
+    </span>
+
+    <button
+        class="discard-btn-pro"
+        onclick="discardSettingsPro()"
+    >
+        تجاهل
+    </button>
+
+    <button
+        class="save-btn-pro"
+        onclick="saveSettingsPro()"
+    >
+        حفظ التغييرات
+    </button>
+
+</div>
+
+
+<!-- =========================================================
+     FIREBASE
+========================================================= -->
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+
+<!-- =========================================================
+     PROJECT JS
+========================================================= -->
+
+<script src="data.js"></script>
+<script src="globals.js"></script>
+<script src="firebase-config.js"></script>
+<script src="utils.js"></script>
+<script src="auth.js"></script>
+<script src="settings.js"></script>
+<script src="social.js"></script>
+<script src="video.js"></script>
+<script src="ui.js"></script>
+<script src="router.js"></script>
+<script src="main.js"></script>
+
+
+<!-- =========================================================
+     SYSTEM B SETTINGS ENGINE
+========================================================= -->
+
+<script>
+
+(() => {
+
+    "use strict";
+
+
+    const DEFAULT_SETTINGS = {
+        theme: "dark",
+        accent: "#ff0033",
+        compact: false,
+        reduceMotion: false,
+        autoplay: true,
+        dataSaver: false,
+        notifications: true,
+        history: true
+    };
+
+
+    let draftSettings = {};
+    let savedSettings = {};
+
+
+    function readSettings() {
+
+        try {
+
+            const raw =
+                JSON.parse(
+                    localStorage.getItem("tt_settings") || "{}"
+                );
+
+            return {
+                ...DEFAULT_SETTINGS,
+                ...raw
+            };
+
+        } catch (e) {
+
+            return {
+                ...DEFAULT_SETTINGS
+            };
+
+        }
+
+    }
+
+
+    function clone(obj) {
+
+        return JSON.parse(
+            JSON.stringify(obj)
+        );
+
+    }
+
+
+    function setToggle(id, state) {
+
+        const el =
+            document.getElementById(id);
+
+        if (!el) return;
+
+        el.classList.toggle(
+            "active",
+            !!state
+        );
+
+    }
+
+
+    function applyDraftSettings() {
+
+        const s = draftSettings;
+
+
+        /* Theme */
+
+        document.documentElement.dataset.theme =
+            s.theme || "dark";
+
+
+        /* Accent */
+
+        document.documentElement.style
+            .setProperty(
+                "--yt-accent",
+                s.accent || "#ff0033"
+            );
+
+
+        /* Compact */
+
+        document.documentElement.classList.toggle(
+            "compact-mode",
+            !!s.compact
+        );
+
+
+        /* Reduce motion */
+
+        document.documentElement.classList.toggle(
+            "reduce-motion",
+            !!s.reduceMotion
+        );
+
+
+        /* Toggles */
+
+        setToggle(
+            "t-pro-dark",
+            s.theme === "dark"
+        );
+
+        setToggle(
+            "t-pro-compact",
+            s.compact
+        );
+
+        setToggle(
+            "t-pro-autoplay",
+            s.autoplay
+        );
+
+        setToggle(
+            "t-pro-dataSaver",
+            s.dataSaver
+        );
+
+        setToggle(
+            "t-pro-notifications",
+            s.notifications
+        );
+
+        setToggle(
+            "t-pro-history",
+            s.history
+        );
+
+        setToggle(
+            "t-pro-motion",
+            s.reduceMotion
+        );
+
+
+        /* Color */
+
+        const color =
+            document.getElementById(
+                "accentColorPro"
+            );
+
+        if (color) {
+
+            color.value =
+                s.accent || "#ff0033";
+
+        }
+
+
+        /* Theme icon */
+
+        const btn =
+            document.getElementById(
+                "themeBtn"
+            );
+
+        if (btn) {
+
+            btn.innerHTML =
+                s.theme === "dark"
+
+                    ? '<i class="fa-solid fa-sun"></i>'
+
+                    : '<i class="fa-solid fa-moon"></i>';
+
+        }
+
+    }
+
+
+    function showSaveBar(show) {
+
+        const bar =
+            document.getElementById(
+                "settingsSaveBar"
+            );
+
+        if (!bar) return;
+
+        bar.classList.toggle(
+            "show",
+            !!show
+        );
+
+    }
+
+
+    function markChanged() {
+
+        const changed =
+            JSON.stringify(
+                draftSettings
+            ) !== JSON.stringify(
+                savedSettings
+            );
+
+        showSaveBar(changed);
+
+    }
+
+
+    window.updateDraftSetting =
+        function(key, value) {
+
+            draftSettings[key] = value;
+
+            applyDraftSettings();
+
+            markChanged();
+
+        };
+
+
+    window.toggleDraftSetting =
+        function(key) {
+
+            if (key === "theme") {
+
+                draftSettings.theme =
+                    draftSettings.theme === "dark"
+                        ? "light"
+                        : "dark";
+
+            } else {
+
+                draftSettings[key] =
+                    !draftSettings[key];
+
+            }
+
+            applyDraftSettings();
+
+            markChanged();
+
+        };
+
+
+    window.forceToggleTheme =
+        function() {
+
+            toggleDraftSetting("theme");
+
+        };
+
+
+    window.saveSettingsPro =
+        function() {
+
+            savedSettings =
+                clone(draftSettings);
+
+            localStorage.setItem(
+                "tt_settings",
+                JSON.stringify(
+                    savedSettings
+                )
+            );
+
+            applyDraftSettings();
+
+            showSaveBar(false);
+
+            if (
+                typeof applyTheme ===
+                "function"
+            ) {
+
+                try {
+                    applyTheme();
+                } catch (e) {}
+
+            }
+
+        };
+
+
+    window.discardSettingsPro =
+        function() {
+
+            draftSettings =
+                clone(savedSettings);
+
+            applyDraftSettings();
+
+            showSaveBar(false);
+
+        };
+
+
+    window.resetSettingsPro =
+        function() {
+
+            if (
+                !confirm(
+                    "متأكد تحب ترجع الإعدادات الكل للوضع الأصلي؟"
+                )
+            ) return;
+
+
+            draftSettings =
+                clone(DEFAULT_SETTINGS);
+
+            applyDraftSettings();
+
+            markChanged();
+
+        };
+
+
+    window.forceOpenSettingsTab =
+        function(tabId, btn) {
+
+            document
+                .querySelectorAll(
+                    ".settings-pane-pro"
+                )
+                .forEach(
+                    pane => {
+
+                        pane.classList.remove(
+                            "active"
+                        );
+
+                    }
+                );
+
+
+            document
+                .querySelectorAll(
+                    ".tab-btn-pro"
+                )
+                .forEach(
+                    b => {
+
+                        b.classList.remove(
+                            "active"
+                        );
+
+                    }
+                );
+
+
+            const pane =
+                document.getElementById(
+                    "set-pro-" + tabId
+                );
+
+
+            if (pane) {
+
+                pane.classList.add(
+                    "active"
+                );
+
+            }
+
+
+            if (btn) {
+
+                btn.classList.add(
+                    "active"
+                );
+
+            }
+
+
+            if (tabId === "profile") {
+
+                if (
+                    typeof renderSettingsUI ===
+                    "function"
+                ) {
+
+                    try {
+                        renderSettingsUI();
+                    } catch (e) {}
+
+                }
+
+            }
+
+        };
+
+
+    window.forceGoSettings =
+        function(tab) {
+
+            if (
+                typeof navigate ===
+                "function"
+            ) {
+
+                navigate("settings");
+
+            }
+
+
+            setTimeout(() => {
+
+                const aliases = {
+
+                    account: "profile",
+                    channel: "profile",
+                    preferences: "appearance",
+                    privacy: "privacy"
+
+                };
+
+                const target =
+                    aliases[tab] || tab;
+
+
+                const btn =
+                    document.querySelector(
+                        '.tab-btn-pro[data-tab="' +
+                        target +
+                        '"]'
+                    );
+
+
+                if (btn) {
+
+                    forceOpenSettingsTab(
+                        target,
+                        btn
+                    );
+
+                }
+
+            }, 80);
+
+        };
+
+
+    window.forceAvatarChange =
+        function(event) {
+
+            const file =
+                event.target.files?.[0];
+
+            if (!file) return;
+
+
+            if (
+                !file.type.startsWith(
+                    "image/"
+                )
+            ) {
+
+                alert(
+                    "اختار صورة صحيحة."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                file.size >
+                5 * 1024 * 1024
+            ) {
+
+                alert(
+                    "الصورة كبيرة برشا. أقصى حاجة 5MB."
+                );
+
+                return;
+
+            }
+
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function(e) {
+
+                    const wrap =
+                        document.getElementById(
+                            "accAvatarWrapPro"
+                        );
+
+
+                    if (!wrap) return;
+
+
+                    wrap.innerHTML =
+                        `<img
+                            src="${e.target.result}"
+                            alt="صورة الحساب"
+                        >`;
+
+                };
+
+
+            reader.readAsDataURL(
+                file
+            );
+
+        };
+
+
+    window.clearHistoryPro =
+        function() {
+
+            if (
+                !confirm(
+                    "متأكد تحب تفسخ السجل الكل؟"
+                )
+            ) return;
+
+
+            try {
+
+                localStorage.removeItem(
+                    "history"
+                );
+
+            } catch (e) {}
+
+
+            if (
+                typeof loadHistoryPage ===
+                "function"
+            ) {
+
+                try {
+                    loadHistoryPage();
+                } catch (e) {}
+
+            }
+
+        };
+
+
+    window.onSearchSubmit =
+        function() {
+
+            const input =
+                document.getElementById(
+                    "searchInput"
+                );
+
+
+            currentFilter.search =
+                input?.value
+                    ?.trim()
+                    ?.toLowerCase() || "";
+
+
+            if (
+                typeof navigate ===
+                "function"
+            ) {
+
+                navigate("home");
+
+            }
+
+        };
+
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        () => {
+
+            savedSettings =
+                readSettings();
+
+            draftSettings =
+                clone(savedSettings);
+
+            applyDraftSettings();
+
+            showSaveBar(false);
+
+        }
+    );
+
+
+})();
+
+</script>
 
 </body>
 </html>
