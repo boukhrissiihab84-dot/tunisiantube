@@ -1,639 +1,578 @@
-// ==========================================================
-// TUNISIANTUBE 🇹🇳
-// MAIN.JS
-// APPLICATION BOOTSTRAP
-// ==========================================================
+// ============================================================
+// MAIN.JS - TunisianTube 🇹🇳
+// Bootstrap + Videos + Settings
+// ============================================================
 
-"use strict";
+(function () {
 
+    "use strict";
 
-// ==========================================================
-// NORMALIZE VIDEO
-// ==========================================================
+    // ============================================================
+    // Settings defaults
+    // ============================================================
 
-function normalizeVideo(raw) {
+    const SETTINGS_KEY = "tt_settings";
 
-    if (!raw || typeof raw !== "object") {
+    const DEFAULT_SETTINGS = {
 
-        return null;
+        theme: "dark",
+        themeColor: "#e11a24",
 
-    }
+        accountName: "",
+        accountHandle: "",
+        accountEmail: "",
+        accountBio: "",
 
+        channelName: "",
+        channelBio: "",
+        channelCategory: "",
+        channelLink: "",
+        channelSocial: "",
 
-    const id =
-        extractCleanId(
-            raw.Video_ID ||
-            raw.video_id ||
-            raw.videoId ||
-            raw.id ||
-            raw.Lien ||
-            raw.lien ||
-            raw.url ||
-            raw.URL ||
-            ""
-        );
+        avatar: "",
 
+        language: "dz",
 
-    if (
-        !id ||
-        id.length !== 11
-    ) {
+        autoplay: false,
+        quality: "auto",
+        playbackSpeed: "1.0",
+        fontSize: "normal",
+        startPage: "home",
 
-        return null;
+        compactMode: false,
+        reduceMotion: false,
 
-    }
+        notifNew: true,
+        notifEmail: false,
 
-
-    const title =
-        raw.Titre ||
-        raw.titre ||
-        raw.title ||
-        raw.name ||
-        "فيديو بلا عنوان";
-
-
-    const channel =
-        raw.Chaine ||
-        raw.chaine ||
-        raw.channel ||
-        raw.Channel ||
-        "قناة تونسية";
-
-
-    const category =
-        raw.Categorie ||
-        raw.categorie ||
-        raw.category ||
-        raw.Category ||
-        "Autre";
-
-
-    const topic =
-        raw.Mawdhou3 ||
-        raw.mawdhou3 ||
-        raw.topic ||
-        raw.Topic ||
-        "Général";
-
-
-    const views =
-        raw.Views ??
-        raw.views ??
-        raw.Vues ??
-        raw.vues ??
-        null;
-
-
-    const date =
-        raw.Date ||
-        raw.date ||
-        raw.PublishedAt ||
-        raw.publishedAt ||
-        raw.createdAt ||
-        null;
-
-
-    const duration =
-        raw.Duration ||
-        raw.duration ||
-        raw.Duree ||
-        raw.duree ||
-        "";
-
-
-    return {
-
-        id,
-
-        title: String(
-            title
-        ),
-
-        channel: String(
-            channel
-        ),
-
-        category: String(
-            category
-        ),
-
-        topic: String(
-            topic
-        ),
-
-        views,
-
-        date,
-
-        duration,
-
-        thumb:
-            `https://img.youtube.com/vi/${id}/mqdefault.jpg`
-
+        privateLikes: false,
+        incognito: false,
+        dataSaver: false
     };
 
-}
+    window.TT_DEFAULT_SETTINGS =
+        DEFAULT_SETTINGS;
 
+    // ============================================================
+    // Video ID
+    // ============================================================
 
-// ==========================================================
-// INITIALIZE DATABASE
-// ==========================================================
-
-function initApp(raw) {
-
-    let source =
-        Array.isArray(raw)
-            ? raw
-            : [];
-
-
-    if (!source.length) {
-
-        console.warn(
-            "⚠️ Database empty. Using fallback."
-        );
-
+    function safeExtractCleanId(value) {
 
         if (
-            typeof GUARANTEED_TOUNES_COURSES !==
-            "undefined"
+            typeof extractCleanId ===
+            "function"
         ) {
-
-            source =
-                GUARANTEED_TOUNES_COURSES;
-
+            return extractCleanId(
+                value
+            );
         }
 
-    }
+        const text =
+            String(value || "");
 
+        const match =
+            text.match(
+                /(?:v=|youtu\.be\/|embed\/|\/v\/|watch\?v=|&v=)([a-zA-Z0-9_-]{11})/
+            );
 
-    const normalized =
-        source
-            .map(
-                normalizeVideo
-            )
-            .filter(Boolean);
-
-
-    if (!normalized.length) {
-
-        console.error(
-            "🚨 No valid videos found. Using guaranteed data."
-        );
-
+        if (match) {
+            return match[1];
+        }
 
         if (
+            text.length === 11
+        ) {
+            return text;
+        }
+
+        return "";
+    }
+
+    // ============================================================
+    // Video initialization
+    // ============================================================
+
+    function initApp(raw) {
+
+        if (
+            !Array.isArray(raw) ||
+            raw.length === 0
+        ) {
+
+            raw =
+                typeof GUARANTEED_TOUNES_COURSES !==
+                "undefined"
+                    ? GUARANTEED_TOUNES_COURSES
+                    : [];
+        }
+
+        window.allVideos =
+            raw
+                .map(function (v) {
+
+                    const id =
+                        safeExtractCleanId(
+                            v.Video_ID ||
+                            v.video_id ||
+                            v.id ||
+                            v.Lien ||
+                            v.url ||
+                            ""
+                        );
+
+                    return {
+
+                        id: id,
+
+                        title:
+                            v.Titre ||
+                            v.title ||
+                            "",
+
+                        channel:
+                            v.Chaine ||
+                            v.channel ||
+                            "",
+
+                        category:
+                            v.Categorie ||
+                            v.category ||
+                            "Autre",
+
+                        topic:
+                            v.Mawdhou3 ||
+                            v.topic ||
+                            "Général",
+
+                        thumb:
+                            "https://img.youtube.com/vi/" +
+                            id +
+                            "/mqdefault.jpg",
+
+                        views:
+                            v.views ||
+                            v.Vues ||
+                            0,
+
+                        date:
+                            v.date ||
+                            v.Date ||
+                            "",
+
+                        duration:
+                            v.duration ||
+                            v.Duree ||
+                            ""
+                    };
+                })
+                .filter(function (v) {
+
+                    return (
+                        v.id &&
+                        v.id.length === 11
+                    );
+                });
+
+        // Fallback
+        if (
+            window.allVideos.length === 0 &&
             typeof GUARANTEED_TOUNES_COURSES !==
             "undefined"
         ) {
 
-            allVideos =
+            window.allVideos =
                 GUARANTEED_TOUNES_COURSES
-                    .map(
-                        normalizeVideo
-                    )
-                    .filter(Boolean);
+                    .map(function (v) {
 
-        } else {
+                        const id =
+                            v.Video_ID;
 
-            allVideos = [];
+                        return {
 
+                            id: id,
+
+                            title:
+                                v.Titre ||
+                                "",
+
+                            channel:
+                                v.Chaine ||
+                                "",
+
+                            category:
+                                v.Categorie ||
+                                "Autre",
+
+                            topic:
+                                v.Mawdhou3 ||
+                                "Général",
+
+                            thumb:
+                                "https://img.youtube.com/vi/" +
+                                id +
+                                "/mqdefault.jpg"
+                        };
+                    });
         }
 
-    } else {
+        // Count
+        const count =
+            document.getElementById(
+                "vCount"
+            );
 
-        allVideos =
-            normalized;
+        if (count) {
 
+            count.textContent =
+                window.allVideos.length +
+                " دورة";
+        }
+
+        // UI
+        if (
+            typeof buildSide ===
+            "function"
+        ) {
+            buildSide();
+        }
+
+        if (
+            typeof buildChips ===
+            "function"
+        ) {
+            buildChips();
+        }
+
+        if (
+            typeof initRouter ===
+            "function"
+        ) {
+            initRouter();
+        } else if (
+            typeof renderHome ===
+            "function"
+        ) {
+            renderHome();
+        }
     }
 
+    window.initApp =
+        initApp;
 
-    /* ======================================================
-       GLOBAL STATE
-    ====================================================== */
+    // ============================================================
+    // Theme compatibility
+    // ============================================================
 
-    activeList =
-        [...allVideos];
+    window.applyTheme =
+        function () {
 
+            let settings = {};
 
-    displayedCount =
-        0;
+            try {
 
+                settings =
+                    JSON.parse(
+                        localStorage.getItem(
+                            SETTINGS_KEY
+                        ) || "{}"
+                    );
 
-    currentFilter =
-        {
-            cat: null,
-            sub: null,
-            search: ""
-        };
+            } catch (e) {}
 
+            const theme =
+                settings.theme ||
+                "dark";
 
-    /* ======================================================
-       UI
-    ====================================================== */
-
-    updateVideoCount();
-
-    buildSide();
-
-    buildChips();
-
-
-    /* ======================================================
-       ROUTER
-    ====================================================== */
-
-    if (
-        typeof initRouter ===
-        "function"
-    ) {
-
-        initRouter();
-
-    }
-
-
-    /* ======================================================
-       FIRST RENDER
-    ====================================================== */
-
-    if (
-        typeof renderHome ===
-        "function"
-    ) {
-
-        renderHome();
-
-    }
-
-}
-
-
-// ==========================================================
-// UPDATE VIDEO COUNT
-// ==========================================================
-
-function updateVideoCount() {
-
-    const count =
-        document.getElementById(
-            "vCount"
-        );
-
-
-    if (count) {
-
-        count.textContent =
-            allVideos.length +
-            " دورة";
-
-    }
-
-
-    const statV =
-        document.getElementById(
-            "statV"
-        );
-
-
-    if (statV) {
-
-        statV.textContent =
-            allVideos.length;
-
-    }
-
-}
-
-
-// ==========================================================
-// LOAD DATABASE
-// ==========================================================
-
-function loadVideosDatabase() {
-
-    return new Promise(
-        resolve => {
-
-            /* =================================================
-               FIRST SOURCE: data.js
-            ================================================== */
-
-            if (
-                typeof rawVideosData !==
-                    "undefined" &&
-                Array.isArray(
-                    rawVideosData
-                ) &&
-                rawVideosData.length
-            ) {
-
-                resolve(
-                    rawVideosData
+            document.documentElement
+                .setAttribute(
+                    "data-theme",
+                    theme
                 );
 
-                return;
+            const accent =
+                settings.themeColor ||
+                DEFAULT_SETTINGS.themeColor;
 
+            document.documentElement.style
+                .setProperty(
+                    "--accent",
+                    accent
+                );
+
+            document.documentElement.style
+                .setProperty(
+                    "--accent-soft",
+                    accent + "26"
+                );
+
+            const btn =
+                document.getElementById(
+                    "themeBtn"
+                );
+
+            if (btn) {
+
+                btn.innerHTML =
+                    theme === "dark"
+                        ? '<i class="fa-solid fa-sun"></i>'
+                        : '<i class="fa-solid fa-moon"></i>';
+            }
+        };
+
+    // ============================================================
+    // Font compatibility
+    // ============================================================
+
+    window.applyFontSize =
+        function () {
+
+            let settings = {};
+
+            try {
+
+                settings =
+                    JSON.parse(
+                        localStorage.getItem(
+                            SETTINGS_KEY
+                        ) || "{}"
+                    );
+
+            } catch (e) {}
+
+            const size =
+                settings.fontSize ||
+                "normal";
+
+            document.body.classList.remove(
+                "font-small",
+                "font-normal",
+                "font-large"
+            );
+
+            document.body.classList.add(
+                "font-" + size
+            );
+        };
+
+    // ============================================================
+    // Settings shortcut
+    // ============================================================
+
+    window.getTTSettings =
+        function () {
+
+            if (
+                typeof SettingsState !==
+                "undefined"
+            ) {
+                return SettingsState.current;
             }
 
+            try {
 
-            /* =================================================
-               SECOND SOURCE: JSON
-            ================================================== */
+                return {
+                    ...DEFAULT_SETTINGS,
+                    ...JSON.parse(
+                        localStorage.getItem(
+                            SETTINGS_KEY
+                        ) || "{}"
+                    )
+                };
 
-            fetch(
-                `tounes_courses.json?nocache=${Date.now()}`,
-                {
-                    cache:
-                        "no-store"
+            } catch (e) {
+
+                return {
+                    ...DEFAULT_SETTINGS
+                };
+            }
+        };
+
+    // ============================================================
+    // Page exit protection
+    // ============================================================
+
+    window.addEventListener(
+        "beforeunload",
+        function (event) {
+
+            if (
+                typeof SettingsState ===
+                    "undefined" ||
+                !SettingsState.hasChanges
+            ) {
+                return;
+            }
+
+            event.preventDefault();
+
+            event.returnValue =
+                "عندك تغييرات مازال ما تحفّظتش.";
+
+            return event.returnValue;
+        }
+    );
+
+    // ============================================================
+    // DOM Ready
+    // ============================================================
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            console.log(
+                "🇹🇳 TunisianTube: تشغيل..."
+            );
+
+            // Theme
+            if (
+                typeof applyTheme ===
+                "function"
+            ) {
+                applyTheme();
+            }
+
+            // Font
+            if (
+                typeof applyFontSize ===
+                "function"
+            ) {
+                applyFontSize();
+            }
+
+            // Settings
+            if (
+                typeof SettingsState !==
+                "undefined"
+            ) {
+
+                SettingsState.init();
+
+                if (
+                    typeof bindFormListeners ===
+                    "function"
+                ) {
+                    bindFormListeners();
                 }
-            )
-                .then(
-                    response => {
+            }
+
+            // Auth
+            if (
+                typeof renderAuth ===
+                "function"
+            ) {
+                renderAuth();
+            }
+
+            // Data
+            try {
+
+                if (
+                    typeof rawVideosData !==
+                        "undefined" &&
+                    Array.isArray(
+                        rawVideosData
+                    ) &&
+                    rawVideosData.length
+                ) {
+
+                    initApp(
+                        rawVideosData
+                    );
+
+                } else {
+
+                    throw new Error(
+                        "data.js empty"
+                    );
+                }
+
+            } catch (error) {
+
+                fetch(
+                    "tounes_courses.json?nocache=" +
+                    Date.now(),
+                    {
+                        cache:
+                            "no-store"
+                    }
+                )
+                    .then(function (response) {
 
                         if (
                             !response.ok
                         ) {
-
                             throw new Error(
-                                "JSON fetch failed"
+                                "JSON error"
                             );
-
                         }
-
 
                         return response.json();
+                    })
+                    .then(function (data) {
 
-                    }
-                )
-                .then(
-                    data => {
-
-                        if (
-                            Array.isArray(
-                                data
-                            ) &&
-                            data.length
-                        ) {
-
-                            resolve(
-                                data
-                            );
-
-                            return;
-
-                        }
-
-
-                        throw new Error(
-                            "JSON empty"
-                        );
-
-                    }
-                )
-                .catch(
-                    error => {
-
-                        console.warn(
-                            "⚠️ JSON unavailable:",
-                            error
-                        );
-
+                        initApp(data);
+                    })
+                    .catch(function () {
 
                         if (
                             typeof GUARANTEED_TOUNES_COURSES !==
                             "undefined"
                         ) {
 
-                            resolve(
+                            initApp(
                                 GUARANTEED_TOUNES_COURSES
                             );
 
                         } else {
 
-                            resolve([]);
-
+                            initApp([]);
                         }
+                    });
+            }
 
+            // Keyboard
+            document.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (
+                        event.key !==
+                        "Escape"
+                    ) {
+                        return;
                     }
-                );
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// APP START
-// ==========================================================
-
-document.addEventListener(
-    "DOMContentLoaded",
-    async () => {
-
-        try {
-
-            /*
-             * Load data
-             */
-
-            const data =
-                await loadVideosDatabase();
-
-
-            /*
-             * Initialize
-             */
-
-            initApp(
-                data
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "❌ TunisianTube startup error:",
-                error
-            );
-
-
-            try {
-
-                initApp(
-                    typeof GUARANTEED_TOUNES_COURSES !==
-                    "undefined"
-                        ? GUARANTEED_TOUNES_COURSES
-                        : []
-                );
-
-            } catch (fallbackError) {
-
-                console.error(
-                    "❌ Fatal startup error:",
-                    fallbackError
-                );
-
-            }
-
-        }
-
-
-        /* =====================================================
-           EXISTING APP SERVICES
-        ====================================================== */
-
-        try {
-
-            if (
-                typeof applyTheme ===
-                "function"
-            ) {
-
-                applyTheme();
-
-            }
-
-        } catch (e) {
-
-            console.warn(
-                "Theme initialization failed:",
-                e
-            );
-
-        }
-
-
-        try {
-
-            if (
-                typeof applyFontSize ===
-                "function"
-            ) {
-
-                applyFontSize();
-
-            }
-
-        } catch (e) {
-
-            console.warn(
-                "Font size initialization failed:",
-                e
-            );
-
-        }
-
-
-        try {
-
-            if (
-                typeof renderAuth ===
-                "function"
-            ) {
-
-                renderAuth();
-
-            }
-
-        } catch (e) {
-
-            console.warn(
-                "Auth rendering failed:",
-                e
-            );
-
-        }
-
-
-        /* =====================================================
-           ESCAPE KEY
-        ====================================================== */
-
-        document.addEventListener(
-            "keydown",
-            event => {
-
-                if (
-                    event.key !==
-                    "Escape"
-                ) {
-
-                    return;
-
-                }
-
-
-                try {
 
                     if (
                         typeof closeAuth ===
                         "function"
                     ) {
-
                         closeAuth();
-
                     }
-
-                } catch (e) {}
-
-
-                try {
 
                     if (
                         typeof closeDlModal ===
                         "function"
                     ) {
-
                         closeDlModal();
-
                     }
 
-                } catch (e) {}
+                    document
+                        .getElementById(
+                            "dropdown"
+                        )
+                        ?.classList.remove(
+                            "show",
+                            "open"
+                        );
+                }
+            );
 
+            console.log(
+                "✅ TunisianTube: جاهز!"
+            );
+        }
+    );
 
-                closeMobileSidebar();
-
-            }
-        );
-
-
-        /* =====================================================
-           RESIZE
-        ====================================================== */
-
-        let resizeTimer;
-
-
-        window.addEventListener(
-            "resize",
-            () => {
-
-                clearTimeout(
-                    resizeTimer
-                );
-
-
-                resizeTimer =
-                    setTimeout(
-                        () => {
-
-                            if (
-                                window.innerWidth >
-                                900
-                            ) {
-
-                                closeMobileSidebar();
-
-                            }
-
-                        },
-                        150
-                    );
-
-            }
-        );
-
-    }
-);
+})();
