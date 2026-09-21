@@ -1,6 +1,7 @@
 // ============================================================
 // MAIN.JS - TunisianTube 🇹🇳
 // Bootstrap + Videos + Settings
+// FIXED VIDEO STATE
 // ============================================================
 
 (function () {
@@ -8,7 +9,7 @@
     "use strict";
 
     // ============================================================
-    // Settings defaults
+    // SETTINGS
     // ============================================================
 
     const SETTINGS_KEY = "tt_settings";
@@ -59,69 +60,62 @@
 
     function safeExtractCleanId(value) {
 
-        if (typeof extractCleanId === "function") {
+        try {
 
-            try {
+            if (
+                typeof extractCleanId === "function"
+            ) {
 
-                const result = extractCleanId(value);
+                const result =
+                    extractCleanId(value);
 
                 if (
                     result &&
-                    typeof result === "string" &&
-                    result.length === 11
+                    String(result).length === 11
                 ) {
-                    return result;
+                    return String(result);
                 }
 
-            } catch (e) {}
+            }
+
+        } catch (e) {
+            console.warn(
+                "extractCleanId error:",
+                e
+            );
         }
 
-        const text = String(value || "").trim();
 
-        if (!text) {
-            return "";
-        }
+        const text =
+            String(value || "").trim();
+
 
         // Direct YouTube ID
-        if (/^[A-Za-z0-9_-]{11}$/.test(text)) {
+        if (
+            /^[a-zA-Z0-9_-]{11}$/.test(text)
+        ) {
+
             return text;
+
         }
+
 
         // YouTube URL
-        const patterns = [
+        const match =
+            text.match(
+                /(?:v=|youtu\.be\/|embed\/|\/v\/|watch\?v=|&v=)([a-zA-Z0-9_-]{11})/
+            );
 
-            /[?&]v=([A-Za-z0-9_-]{11})/,
 
-            /youtu\.be\/([A-Za-z0-9_-]{11})/,
+        if (match) {
 
-            /youtube\.com\/embed\/([A-Za-z0-9_-]{11})/,
+            return match[1];
 
-            /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/,
-
-            /youtube\.com\/live\/([A-Za-z0-9_-]{11})/
-
-        ];
-
-        for (const pattern of patterns) {
-
-            const match = text.match(pattern);
-
-            if (match && match[1]) {
-                return match[1];
-            }
         }
 
-        // Last fallback:
-        // search any 11-character YouTube-looking ID
-        const generic = text.match(
-            /(?:^|[^A-Za-z0-9_-])([A-Za-z0-9_-]{11})(?:[^A-Za-z0-9_-]|$)/
-        );
-
-        if (generic && generic[1]) {
-            return generic[1];
-        }
 
         return "";
+
     }
 
 
@@ -129,86 +123,97 @@
     // NORMALIZE VIDEO
     // ============================================================
 
-    function normalizeVideo(video) {
+    function normalizeVideo(raw) {
 
-        if (!video || typeof video !== "object") {
+        if (
+            !raw ||
+            typeof raw !== "object"
+        ) {
+
             return null;
+
         }
 
-        const id = safeExtractCleanId(
 
-            video.Video_ID ||
+        const id =
+            safeExtractCleanId(
+                raw.Video_ID ||
+                raw.video_id ||
+                raw.videoId ||
+                raw.id ||
+                raw.Lien ||
+                raw.lien ||
+                raw.url ||
+                raw.URL ||
+                ""
+            );
 
-            video.video_id ||
 
-            video.videoId ||
+        if (
+            !id ||
+            id.length !== 11
+        ) {
 
-            video.id ||
-
-            video.Lien ||
-
-            video.lien ||
-
-            video.url ||
-
-            video.URL ||
-
-            ""
-        );
-
-        if (!id || id.length !== 11) {
             return null;
+
         }
+
 
         const title =
-            video.Titre ||
-            video.titre ||
-            video.title ||
-            video.name ||
+            raw.Titre ||
+            raw.titre ||
+            raw.title ||
+            raw.name ||
             "فيديو بلا عنوان";
 
+
         const channel =
-            video.Chaine ||
-            video.chaine ||
-            video.channel ||
-            video.Channel ||
+            raw.Chaine ||
+            raw.chaine ||
+            raw.channel ||
+            raw.Channel ||
             "قناة تونسية";
 
+
         const category =
-            video.Categorie ||
-            video.categorie ||
-            video.category ||
-            video.Category ||
+            raw.Categorie ||
+            raw.categorie ||
+            raw.category ||
+            raw.Category ||
             "Autre";
 
+
         const topic =
-            video.Mawdhou3 ||
-            video.mawdhou3 ||
-            video.topic ||
-            video.Topic ||
+            raw.Mawdhou3 ||
+            raw.mawdhou3 ||
+            raw.topic ||
+            raw.Topic ||
             "Général";
 
+
         const views =
-            video.Views ??
-            video.views ??
-            video.Vues ??
-            video.vues ??
+            raw.views ??
+            raw.Views ??
+            raw.Vues ??
+            raw.vues ??
             0;
 
+
         const date =
-            video.Date ||
-            video.date ||
-            video.PublishedAt ||
-            video.publishedAt ||
-            video.createdAt ||
+            raw.date ||
+            raw.Date ||
+            raw.PublishedAt ||
+            raw.publishedAt ||
             "";
 
+
         const duration =
-            video.Duration ||
-            video.duration ||
-            video.Duree ||
-            video.duree ||
+            raw.duration ||
+            raw.Duration ||
+            raw.Duree ||
+            raw.duree ||
             "";
+
 
         return {
 
@@ -232,61 +237,55 @@
                 "https://img.youtube.com/vi/" +
                 id +
                 "/mqdefault.jpg"
+
         };
+
     }
 
 
     // ============================================================
-    // INIT VIDEOS
+    // INITIALIZE VIDEOS
     // ============================================================
 
     function initApp(raw) {
 
         console.log(
-            "🇹🇳 Initialisation des vidéos..."
+            "🇹🇳 TunisianTube: initializing videos..."
         );
 
-        let source = [];
+
+        let source =
+            Array.isArray(raw)
+                ? raw
+                : [];
+
 
         // --------------------------------------------------------
-        // 1. data.js
+        // Fallback if data.js is empty
         // --------------------------------------------------------
 
         if (
-            Array.isArray(raw) &&
-            raw.length > 0
+            source.length === 0
         ) {
 
-            source = raw;
-
-            console.log(
-                "📦 Source: data.js",
-                source.length,
-                "vidéos"
+            console.warn(
+                "⚠️ data.js empty. Using guaranteed courses."
             );
-        }
 
-        // --------------------------------------------------------
-        // 2. Guaranteed fallback
-        // --------------------------------------------------------
 
-        else if (
-            typeof GUARANTEED_TOUNES_COURSES !==
-            "undefined" &&
-            Array.isArray(
-                GUARANTEED_TOUNES_COURSES
-            ) &&
-            GUARANTEED_TOUNES_COURSES.length
-        ) {
+            if (
+                typeof GUARANTEED_TOUNES_COURSES !==
+                "undefined" &&
+                Array.isArray(
+                    GUARANTEED_TOUNES_COURSES
+                )
+            ) {
 
-            source =
-                GUARANTEED_TOUNES_COURSES;
+                source =
+                    GUARANTEED_TOUNES_COURSES;
 
-            console.log(
-                "📦 Source: GUARANTEED_TOUNES_COURSES",
-                source.length,
-                "vidéos"
-            );
+            }
+
         }
 
 
@@ -294,28 +293,65 @@
         // Normalize
         // --------------------------------------------------------
 
-        const normalized =
+        let normalized =
             source
                 .map(normalizeVideo)
                 .filter(Boolean);
 
 
         console.log(
-            "🎬 Vidéos valides:",
+            "📦 Raw videos:",
+            source.length
+        );
+
+        console.log(
+            "🎬 Valid videos:",
             normalized.length
         );
 
 
         // --------------------------------------------------------
-        // IMPORTANT:
-        // Use the lexical global from globals.js.
-        //
-        // DO NOT use:
-        // window.allVideos = ...
-        //
-        // because ui.js uses:
-        // allVideos
+        // Guaranteed fallback
         // --------------------------------------------------------
+
+        if (
+            normalized.length === 0 &&
+            typeof GUARANTEED_TOUNES_COURSES !==
+                "undefined" &&
+            Array.isArray(
+                GUARANTEED_TOUNES_COURSES
+            )
+        ) {
+
+            console.warn(
+                "⚠️ No valid videos from data.js. Loading guaranteed courses."
+            );
+
+
+            normalized =
+                GUARANTEED_TOUNES_COURSES
+                    .map(normalizeVideo)
+                    .filter(Boolean);
+
+        }
+
+
+        // ========================================================
+        // IMPORTANT FIX
+        // ========================================================
+        //
+        // globals.js contains:
+        //
+        // let allVideos = [];
+        //
+        // Therefore we MUST modify that exact variable.
+        //
+        // Do NOT replace it with:
+        //
+        // window.allVideos = [...]
+        //
+        // because window.allVideos is a different property.
+        // ========================================================
 
         allVideos.length = 0;
 
@@ -324,8 +360,12 @@
         );
 
 
+        // Compatibility for old scripts
+        window.allVideos = allVideos;
+
+
         // --------------------------------------------------------
-        // Reset UI state
+        // Active list
         // --------------------------------------------------------
 
         activeList.length = 0;
@@ -334,53 +374,44 @@
             ...allVideos
         );
 
+
         displayedCount = 0;
 
-        currentFilter = {
 
-            cat: null,
-
-            sub: null,
-
-            search: ""
-        };
+        currentFilter.cat = null;
+        currentFilter.sub = null;
+        currentFilter.search = "";
 
 
         // --------------------------------------------------------
         // Count
         // --------------------------------------------------------
 
-        const count =
-            document.getElementById(
-                "vCount"
-            );
-
-        if (count) {
-
-            count.textContent =
-                allVideos.length +
-                " دورة";
-        }
+        updateVideoCounters();
 
 
         // --------------------------------------------------------
         // Sidebar
         // --------------------------------------------------------
 
-        if (
-            typeof buildSide ===
-            "function"
-        ) {
+        try {
 
-            try {
+            if (
+                typeof buildSide ===
+                "function"
+            ) {
+
                 buildSide();
-            } catch (e) {
 
-                console.error(
-                    "buildSide error:",
-                    e
-                );
             }
+
+        } catch (error) {
+
+            console.error(
+                "❌ buildSide error:",
+                error
+            );
+
         }
 
 
@@ -388,20 +419,24 @@
         // Chips
         // --------------------------------------------------------
 
-        if (
-            typeof buildChips ===
-            "function"
-        ) {
+        try {
 
-            try {
+            if (
+                typeof buildChips ===
+                "function"
+            ) {
+
                 buildChips();
-            } catch (e) {
 
-                console.error(
-                    "buildChips error:",
-                    e
-                );
             }
+
+        } catch (error) {
+
+            console.error(
+                "❌ buildChips error:",
+                error
+            );
+
         }
 
 
@@ -409,56 +444,57 @@
         // Router
         // --------------------------------------------------------
 
-        if (
-            typeof initRouter ===
-            "function"
-        ) {
+        try {
 
-            try {
+            if (
+                typeof initRouter ===
+                "function"
+            ) {
+
                 initRouter();
-            } catch (e) {
 
-                console.error(
-                    "initRouter error:",
-                    e
-                );
             }
+
+        } catch (error) {
+
+            console.error(
+                "❌ Router error:",
+                error
+            );
+
         }
 
 
         // --------------------------------------------------------
-        // Render HOME
+        // Home render
         // --------------------------------------------------------
 
-        if (
-            typeof renderHome ===
-            "function"
-        ) {
+        try {
 
-            try {
+            if (
+                typeof renderHome ===
+                "function"
+            ) {
 
                 renderHome();
 
-                console.log(
-                    "✅ Home rendered:",
-                    allVideos.length,
-                    "videos"
-                );
-
-            } catch (e) {
-
-                console.error(
-                    "❌ renderHome error:",
-                    e
-                );
             }
 
-        } else {
+        } catch (error) {
 
             console.error(
-                "❌ renderHome() introuvable"
+                "❌ renderHome error:",
+                error
             );
+
         }
+
+
+        console.log(
+            "✅ TunisianTube videos ready:",
+            allVideos.length
+        );
+
     }
 
 
@@ -466,107 +502,66 @@
 
 
     // ============================================================
-    // LOAD VIDEOS DATABASE
+    // VIDEO COUNTERS
     // ============================================================
 
-    function loadVideosDatabase() {
+    function updateVideoCounters() {
 
-        // --------------------------------------------------------
-        // data.js
-        // --------------------------------------------------------
-
-        if (
-            typeof rawVideosData !==
-            "undefined" &&
-            Array.isArray(rawVideosData) &&
-            rawVideosData.length > 0
-        ) {
-
-            initApp(
-                rawVideosData
+        const count =
+            document.getElementById(
+                "vCount"
             );
 
-            return;
+
+        if (count) {
+
+            count.textContent =
+                allVideos.length +
+                " دورة";
+
         }
 
 
-        // --------------------------------------------------------
-        // JSON fallback
-        // --------------------------------------------------------
-
-        console.warn(
-            "⚠️ rawVideosData absent. Trying JSON..."
-        );
+        const statV =
+            document.getElementById(
+                "statV"
+            );
 
 
-        fetch(
-            "tounes_courses.json?nocache=" +
-            Date.now(),
-            {
-                cache: "no-store"
-            }
-        )
+        if (statV) {
 
-            .then(function (response) {
+            statV.textContent =
+                allVideos.length;
 
-                if (!response.ok) {
+        }
 
-                    throw new Error(
-                        "JSON HTTP " +
-                        response.status
-                    );
-                }
 
-                return response.json();
-            })
+        const statC =
+            document.getElementById(
+                "statC"
+            );
 
-            .then(function (data) {
 
-                if (
-                    Array.isArray(data) &&
-                    data.length
-                ) {
+        if (statC) {
 
-                    initApp(data);
-
-                } else {
-
-                    throw new Error(
-                        "JSON vide"
-                    );
-                }
-            })
-
-            .catch(function (error) {
-
-                console.warn(
-                    "⚠️ JSON fallback failed:",
-                    error
+            const categories =
+                new Set(
+                    allVideos
+                        .map(v => v.category)
+                        .filter(Boolean)
                 );
 
 
-                // ------------------------------------------------
-                // Guaranteed fallback
-                // ------------------------------------------------
+            statC.textContent =
+                categories.size;
 
-                if (
-                    typeof GUARANTEED_TOUNES_COURSES !==
-                    "undefined" &&
-                    Array.isArray(
-                        GUARANTEED_TOUNES_COURSES
-                    )
-                ) {
+        }
 
-                    initApp(
-                        GUARANTEED_TOUNES_COURSES
-                    );
-
-                } else {
-
-                    initApp([]);
-                }
-            });
     }
+
+
+    window.updateVideoCounters =
+        updateVideoCounters;
 
 
     // ============================================================
@@ -577,6 +572,7 @@
         function () {
 
             let settings = {};
+
 
             try {
 
@@ -590,12 +586,13 @@
             } catch (e) {
 
                 settings = {};
+
             }
 
 
             const theme =
                 settings.theme ||
-                DEFAULT_SETTINGS.theme;
+                "dark";
 
 
             document.documentElement
@@ -607,6 +604,7 @@
 
             const accent =
                 settings.themeColor ||
+                settings.accent ||
                 DEFAULT_SETTINGS.themeColor;
 
 
@@ -624,6 +622,13 @@
                 );
 
 
+            document.documentElement.style
+                .setProperty(
+                    "--yt-accent",
+                    accent
+                );
+
+
             const btn =
                 document.getElementById(
                     "themeBtn"
@@ -638,7 +643,9 @@
                         ? '<i class="fa-solid fa-sun"></i>'
 
                         : '<i class="fa-solid fa-moon"></i>';
+
             }
+
         };
 
 
@@ -650,6 +657,7 @@
         function () {
 
             let settings = {};
+
 
             try {
 
@@ -663,20 +671,18 @@
             } catch (e) {
 
                 settings = {};
+
             }
 
 
             const size =
                 settings.fontSize ||
-                DEFAULT_SETTINGS.fontSize;
+                "normal";
 
 
             document.body.classList.remove(
-
                 "font-small",
-
                 "font-normal",
-
                 "font-large"
             );
 
@@ -684,24 +690,30 @@
             document.body.classList.add(
                 "font-" + size
             );
+
         };
 
 
     // ============================================================
-    // SETTINGS SHORTCUT
+    // SETTINGS GETTER
     // ============================================================
 
     window.getTTSettings =
         function () {
 
-            if (
-                typeof SettingsState !==
-                "undefined" &&
-                SettingsState.current
-            ) {
+            try {
 
-                return SettingsState.current;
-            }
+                if (
+                    typeof SettingsState !==
+                    "undefined" &&
+                    SettingsState.current
+                ) {
+
+                    return SettingsState.current;
+
+                }
+
+            } catch (e) {}
 
 
             try {
@@ -715,6 +727,7 @@
                             SETTINGS_KEY
                         ) || "{}"
                     )
+
                 };
 
             } catch (e) {
@@ -722,34 +735,40 @@
                 return {
                     ...DEFAULT_SETTINGS
                 };
+
             }
+
         };
 
 
     // ============================================================
-    // PAGE EXIT PROTECTION
+    // BEFORE UNLOAD
     // ============================================================
 
     window.addEventListener(
         "beforeunload",
         function (event) {
 
-            if (
-                typeof SettingsState ===
-                "undefined" ||
-                !SettingsState.hasChanges
-            ) {
+            try {
 
-                return;
-            }
+                if (
+                    typeof SettingsState ===
+                    "undefined" ||
+                    !SettingsState.hasChanges
+                ) {
+
+                    return;
+
+                }
 
 
-            event.preventDefault();
+                event.preventDefault();
 
-            event.returnValue =
-                "عندك تغييرات مازال ما تحفّظتش.";
+                event.returnValue =
+                    "عندك تغييرات مازال ما تحفّظتش.";
 
-            return event.returnValue;
+            } catch (e) {}
+
         }
     );
 
@@ -771,20 +790,24 @@
             // Theme
             // ----------------------------------------------------
 
-            if (
-                typeof applyTheme ===
-                "function"
-            ) {
+            try {
 
-                try {
+                if (
+                    typeof applyTheme ===
+                    "function"
+                ) {
+
                     applyTheme();
-                } catch (e) {
 
-                    console.warn(
-                        "applyTheme error:",
-                        e
-                    );
                 }
+
+            } catch (error) {
+
+                console.warn(
+                    "Theme initialization failed:",
+                    error
+                );
+
             }
 
 
@@ -792,20 +815,24 @@
             // Font
             // ----------------------------------------------------
 
-            if (
-                typeof applyFontSize ===
-                "function"
-            ) {
+            try {
 
-                try {
+                if (
+                    typeof applyFontSize ===
+                    "function"
+                ) {
+
                     applyFontSize();
-                } catch (e) {
 
-                    console.warn(
-                        "applyFontSize error:",
-                        e
-                    );
                 }
+
+            } catch (error) {
+
+                console.warn(
+                    "Font initialization failed:",
+                    error
+                );
+
             }
 
 
@@ -813,39 +840,34 @@
             // Settings
             // ----------------------------------------------------
 
-            if (
-                typeof SettingsState !==
-                "undefined"
-            ) {
+            try {
 
-                try {
+                if (
+                    typeof SettingsState !==
+                    "undefined"
+                ) {
 
                     SettingsState.init();
 
-                } catch (e) {
 
-                    console.warn(
-                        "SettingsState.init error:",
-                        e
-                    );
-                }
+                    if (
+                        typeof bindFormListeners ===
+                        "function"
+                    ) {
 
-
-                if (
-                    typeof bindFormListeners ===
-                    "function"
-                ) {
-
-                    try {
                         bindFormListeners();
-                    } catch (e) {
 
-                        console.warn(
-                            "bindFormListeners error:",
-                            e
-                        );
                     }
+
                 }
+
+            } catch (error) {
+
+                console.warn(
+                    "Settings initialization failed:",
+                    error
+                );
+
             }
 
 
@@ -853,33 +875,160 @@
             // Auth
             // ----------------------------------------------------
 
-            if (
-                typeof renderAuth ===
-                "function"
-            ) {
+            try {
 
-                try {
+                if (
+                    typeof renderAuth ===
+                    "function"
+                ) {
+
                     renderAuth();
-                } catch (e) {
 
-                    console.warn(
-                        "renderAuth error:",
-                        e
-                    );
                 }
+
+            } catch (error) {
+
+                console.warn(
+                    "Auth initialization failed:",
+                    error
+                );
+
             }
 
 
             // ----------------------------------------------------
-            // VIDEOS
+            // DATA
             // ----------------------------------------------------
 
-            loadVideosDatabase();
+            try {
+
+                if (
+                    typeof rawVideosData !==
+                    "undefined" &&
+                    Array.isArray(
+                        rawVideosData
+                    ) &&
+                    rawVideosData.length > 0
+                ) {
+
+                    console.log(
+                        "📚 Loading data.js:",
+                        rawVideosData.length,
+                        "videos"
+                    );
 
 
-            // ----------------------------------------------------
-            // Keyboard
-            // ----------------------------------------------------
+                    initApp(
+                        rawVideosData
+                    );
+
+
+                } else {
+
+                    console.warn(
+                        "⚠️ rawVideosData not available."
+                    );
+
+
+                    throw new Error(
+                        "data.js empty or unavailable"
+                    );
+
+                }
+
+            } catch (error) {
+
+                console.warn(
+                    "⚠️ data.js failed:",
+                    error
+                );
+
+
+                // ------------------------------------------------
+                // JSON fallback
+                // ------------------------------------------------
+
+                fetch(
+                    "tounes_courses.json?nocache=" +
+                    Date.now(),
+                    {
+                        cache: "no-store"
+                    }
+                )
+                    .then(
+                        function (response) {
+
+                            if (
+                                !response.ok
+                            ) {
+
+                                throw new Error(
+                                    "JSON error " +
+                                    response.status
+                                );
+
+                            }
+
+
+                            return response.json();
+
+                        }
+                    )
+                    .then(
+                        function (data) {
+
+                            console.log(
+                                "📚 JSON loaded:",
+                                Array.isArray(data)
+                                    ? data.length
+                                    : 0
+                            );
+
+
+                            initApp(data);
+
+                        }
+                    )
+                    .catch(
+                        function (jsonError) {
+
+                            console.warn(
+                                "⚠️ JSON fallback failed:",
+                                jsonError
+                            );
+
+
+                            // ------------------------------------
+                            // Guaranteed fallback
+                            // ------------------------------------
+
+                            if (
+                                typeof GUARANTEED_TOUNES_COURSES !==
+                                    "undefined" &&
+                                Array.isArray(
+                                    GUARANTEED_TOUNES_COURSES
+                                )
+                            ) {
+
+                                initApp(
+                                    GUARANTEED_TOUNES_COURSES
+                                );
+
+                            } else {
+
+                                initApp([]);
+
+                            }
+
+                        }
+                    );
+
+            }
+
+
+            // ====================================================
+            // KEYBOARD
+            // ====================================================
 
             document.addEventListener(
                 "keydown",
@@ -891,25 +1040,36 @@
                     ) {
 
                         return;
+
                     }
 
 
-                    if (
-                        typeof closeAuth ===
-                        "function"
-                    ) {
+                    try {
 
-                        closeAuth();
-                    }
+                        if (
+                            typeof closeAuth ===
+                            "function"
+                        ) {
+
+                            closeAuth();
+
+                        }
+
+                    } catch (e) {}
 
 
-                    if (
-                        typeof closeDlModal ===
-                        "function"
-                    ) {
+                    try {
 
-                        closeDlModal();
-                    }
+                        if (
+                            typeof closeDlModal ===
+                            "function"
+                        ) {
+
+                            closeDlModal();
+
+                        }
+
+                    } catch (e) {}
 
 
                     const dropdown =
@@ -924,7 +1084,9 @@
                             "show",
                             "open"
                         );
+
                     }
+
                 }
             );
 
@@ -932,6 +1094,7 @@
             console.log(
                 "✅ TunisianTube: جاهز!"
             );
+
         }
     );
 
