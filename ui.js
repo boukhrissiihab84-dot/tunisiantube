@@ -1,7 +1,9 @@
+```javascript
 // ==========================================================
 // TUNISIANTUBE 🇹🇳
 // UI.JS
 // SYSTEM B - YOUTUBE 2024 STYLE
+// FIXED VIDEO RENDERING
 // ==========================================================
 
 "use strict";
@@ -95,17 +97,14 @@ function buildSide() {
     const cats = {};
     const subs = {};
 
-
     allVideos.forEach(v => {
 
         const category =
             v.category ||
             "Autre";
 
-
         cats[category] =
             (cats[category] || 0) + 1;
-
 
         if (
             v.topic &&
@@ -114,9 +113,7 @@ function buildSide() {
 
             subs[v.topic] =
                 (subs[v.topic] || 0) + 1;
-
         }
-
     });
 
 
@@ -221,12 +218,9 @@ function buildSide() {
                             </span>
 
                         </button>
-
                     `;
-
                 }
             );
-
     }
 
 
@@ -281,23 +275,18 @@ function buildSide() {
                             </span>
 
                         </button>
-
                     `;
-
                 }
             );
 
         } else {
 
             sl.innerHTML = "";
-
         }
-
     }
 
 
     updateStats(cats);
-
 }
 
 
@@ -327,7 +316,6 @@ function updateStats(cats) {
 
         statV.textContent =
             allVideos.length;
-
     }
 
 
@@ -335,7 +323,6 @@ function updateStats(cats) {
 
         statC.textContent =
             Object.keys(cats).length;
-
     }
 
 
@@ -344,9 +331,7 @@ function updateStats(cats) {
         vCount.textContent =
             allVideos.length +
             " دورة";
-
     }
-
 }
 
 
@@ -400,7 +385,6 @@ function buildChips() {
 
         Bureautique:
             "📊 مكتبية"
-
     };
 
 
@@ -413,7 +397,6 @@ function buildChips() {
         >
             الكل
         </button>
-
     `;
 
 
@@ -432,12 +415,9 @@ function buildChips() {
                         escapeHtml(category)
                     }
                 </button>
-
             `;
-
         }
     );
-
 }
 
 
@@ -448,7 +428,6 @@ function buildChips() {
 function renderHome() {
 
     apply();
-
 }
 
 
@@ -458,10 +437,21 @@ function renderHome() {
 
 function setListAndRender(list) {
 
-    activeList =
-        Array.isArray(list)
-            ? list
-            : [];
+    /*
+     * IMPORTANT:
+     * Keep the original activeList array reference
+     * from globals.js.
+     */
+
+    activeList.length = 0;
+
+
+    if (Array.isArray(list)) {
+
+        activeList.push(
+            ...list
+        );
+    }
 
 
     displayedCount = 0;
@@ -472,6 +462,7 @@ function setListAndRender(list) {
             "grid"
         );
 
+
     const empty =
         document.getElementById(
             "empty"
@@ -481,7 +472,6 @@ function setListAndRender(list) {
     if (grid) {
 
         grid.innerHTML = "";
-
     }
 
 
@@ -514,21 +504,17 @@ function setListAndRender(list) {
                     </p>
 
                 </div>
-
             `;
-
         }
 
 
         if (observer) {
 
             observer.disconnect();
-
         }
 
 
         return;
-
     }
 
 
@@ -536,14 +522,12 @@ function setListAndRender(list) {
 
         empty.style.display =
             "none";
-
     }
 
 
     setupInfiniteScroll();
 
     renderNextBatch();
-
 }
 
 
@@ -556,7 +540,6 @@ function setupInfiniteScroll() {
     if (observer) {
 
         observer.disconnect();
-
     }
 
 
@@ -579,7 +562,6 @@ function setupInfiniteScroll() {
                 ) {
 
                     renderNextBatch();
-
                 }
 
             },
@@ -593,7 +575,6 @@ function setupInfiniteScroll() {
     observer.observe(
         sentinel
     );
-
 }
 
 
@@ -741,9 +722,7 @@ function ytCard(v) {
             </div>
 
         </article>
-
     `;
-
 }
 
 
@@ -759,7 +738,14 @@ function renderNextBatch() {
         );
 
 
-    if (!grid) return;
+    if (!grid) {
+
+        console.warn(
+            "⚠️ #grid introuvable"
+        );
+
+        return;
+    }
 
 
     const batch =
@@ -773,7 +759,6 @@ function renderNextBatch() {
     if (!batch.length) {
 
         return;
-
     }
 
 
@@ -787,7 +772,6 @@ function renderNextBatch() {
             .map(ytCard)
             .join("")
     );
-
 }
 
 
@@ -804,7 +788,6 @@ function showAll() {
         sub: null,
 
         search: ""
-
     };
 
 
@@ -817,7 +800,6 @@ function showAll() {
     if (input) {
 
         input.value = "";
-
     }
 
 
@@ -835,7 +817,7 @@ function showAll() {
 
     document
         .querySelector(
-            '#catList .side-btn'
+            "#catList .side-btn"
         )
         ?.classList.add(
             "active"
@@ -866,7 +848,6 @@ function showAll() {
     navigate(
         "home"
     );
-
 }
 
 
@@ -882,7 +863,6 @@ function filterCategory(category) {
     currentFilter.sub =
         null;
 
-
     currentFilter.search =
         "";
 
@@ -896,7 +876,6 @@ function filterCategory(category) {
     if (input) {
 
         input.value = "";
-
     }
 
 
@@ -945,7 +924,6 @@ function filterCategory(category) {
     navigate(
         "home"
     );
-
 }
 
 
@@ -958,7 +936,6 @@ function filterChipHome(category) {
     filterCategory(
         category
     );
-
 }
 
 
@@ -987,7 +964,6 @@ function filterSubHome(topic) {
     if (input) {
 
         input.value = "";
-
     }
 
 
@@ -1027,7 +1003,6 @@ function filterSubHome(topic) {
     navigate(
         "home"
     );
-
 }
 
 
@@ -1075,90 +1050,160 @@ function onSearchInput() {
             },
             250
         );
-
 }
 
 
 // ==========================================================
 // FILTER ENGINE
+// FIXED
 // ==========================================================
 
 function apply() {
 
-    let result =
-        [...allVideos];
-
+    /*
+     * Some older versions of main.js use:
+     *
+     * window.allVideos
+     *
+     * while globals.js uses:
+     *
+     * let allVideos = [];
+     *
+     * Keep both synchronized.
+     */
 
     if (
+        Array.isArray(window.allVideos) &&
+        window.allVideos.length > 0 &&
+        window.allVideos !== allVideos
+    ) {
+
+        allVideos.length = 0;
+
+        allVideos.push(
+            ...window.allVideos
+        );
+    }
+
+
+    const source =
+        Array.isArray(allVideos) &&
+        allVideos.length
+            ? allVideos
+            : (
+                Array.isArray(
+                    window.allVideos
+                )
+                    ? window.allVideos
+                    : []
+            );
+
+
+    console.log(
+        "🎬 UI videos:",
+        source.length
+    );
+
+
+    let result =
+        [...source];
+
+
+    // ------------------------------------------------------
+    // Category
+    // ------------------------------------------------------
+
+    if (
+        currentFilter &&
         currentFilter.cat
     ) {
 
         result =
             result.filter(
                 v =>
-                    v.category ===
-                    currentFilter.cat
+                    String(
+                        v.category || ""
+                    ) ===
+                    String(
+                        currentFilter.cat
+                    )
             );
-
     }
 
 
+    // ------------------------------------------------------
+    // Topic
+    // ------------------------------------------------------
+
     if (
+        currentFilter &&
         currentFilter.sub
     ) {
 
         result =
             result.filter(
                 v =>
-                    v.topic ===
-                    currentFilter.sub
+                    String(
+                        v.topic || ""
+                    ) ===
+                    String(
+                        currentFilter.sub
+                    )
             );
-
     }
 
 
+    // ------------------------------------------------------
+    // Search
+    // ------------------------------------------------------
+
     if (
+        currentFilter &&
         currentFilter.search
     ) {
 
         const query =
-            currentFilter.search;
+            String(
+                currentFilter.search
+            )
+                .trim()
+                .toLowerCase();
 
 
-        result =
-            result.filter(
-                v => {
+        if (query) {
 
-                    const text = [
+            result =
+                result.filter(
+                    v => {
 
-                        v.title,
+                        const text = [
 
-                        v.channel,
+                            v.title,
 
-                        v.topic,
+                            v.channel,
 
-                        v.category
+                            v.topic,
 
-                    ]
-                        .filter(Boolean)
-                        .join(" ")
-                        .toLowerCase();
+                            v.category
+
+                        ]
+                            .filter(Boolean)
+                            .join(" ")
+                            .toLowerCase();
 
 
-                    return text.includes(
-                        query
-                    );
-
-                }
-            );
-
+                        return text.includes(
+                            query
+                        );
+                    }
+                );
+        }
     }
 
 
     setListAndRender(
         result
     );
-
 }
 
 
@@ -1183,7 +1228,6 @@ function loadCategoryPage(
                 category
             ] ||
             CAT_ICONS.Autre;
-
     }
 
 
@@ -1197,7 +1241,6 @@ function loadCategoryPage(
 
         title.textContent =
             category;
-
     }
 
 
@@ -1218,9 +1261,7 @@ function loadCategoryPage(
                 )
                 .map(ytCard)
                 .join("");
-
     }
-
 }
 
 
@@ -1239,7 +1280,6 @@ function loadLikedPage() {
         );
 
         return;
-
     }
 
 
@@ -1274,9 +1314,7 @@ function loadLikedPage() {
         ),
 
         "ما عندك حتى فيديو معجب بيه"
-
     );
-
 }
 
 
@@ -1295,7 +1333,6 @@ function loadSubscriptionsPage() {
         );
 
         return;
-
     }
 
 
@@ -1329,9 +1366,7 @@ function loadSubscriptionsPage() {
         ),
 
         "ما انت مشترك في حتى قناة"
-
     );
-
 }
 
 
@@ -1368,9 +1403,7 @@ function loadHistoryPage() {
         list,
 
         "السجل فارغ"
-
     );
-
 }
 
 
@@ -1415,11 +1448,9 @@ function renderGridPage(
                 </h2>
 
             </div>
-
         `;
 
         return;
-
     }
 
 
@@ -1427,7 +1458,6 @@ function renderGridPage(
         list
             .map(ytCard)
             .join("");
-
 }
 
 
@@ -1469,7 +1499,6 @@ function toggleSidebar() {
 
 
         return;
-
     }
 
 
@@ -1484,7 +1513,6 @@ function toggleSidebar() {
             "mini"
         )
     );
-
 }
 
 
@@ -1514,7 +1542,6 @@ function closeMobileSidebar() {
     backdrop?.classList.remove(
         "show"
     );
-
 }
 
 
@@ -1531,7 +1558,6 @@ function formatViews(value) {
     ) {
 
         return "";
-
     }
 
 
@@ -1547,7 +1573,6 @@ function formatViews(value) {
     ) {
 
         return "";
-
     }
 
 
@@ -1561,7 +1586,6 @@ function formatViews(value) {
             1000000
         ).toFixed(1) +
         "M";
-
     }
 
 
@@ -1575,14 +1599,12 @@ function formatViews(value) {
             1000
         ).toFixed(1) +
         "K";
-
     }
 
 
     return String(
         number
     );
-
 }
 
 
@@ -1597,7 +1619,6 @@ function timeAgo(
     if (!dateString) {
 
         return "";
-
     }
 
 
@@ -1614,7 +1635,6 @@ function timeAgo(
     ) {
 
         return "";
-
     }
 
 
@@ -1632,7 +1652,6 @@ function timeAgo(
     ) {
 
         return "توّا";
-
     }
 
 
@@ -1645,9 +1664,7 @@ function timeAgo(
                 seconds / 60
             ) +
             " دقيقة"
-
         );
-
     }
 
 
@@ -1660,9 +1677,7 @@ function timeAgo(
                 seconds / 3600
             ) +
             " ساعات"
-
         );
-
     }
 
 
@@ -1675,9 +1690,7 @@ function timeAgo(
                 seconds / 86400
             ) +
             " أيام"
-
         );
-
     }
 
 
@@ -1690,9 +1703,7 @@ function timeAgo(
                 seconds / 2592000
             ) +
             " أشهر"
-
         );
-
     }
 
 
@@ -1702,7 +1713,6 @@ function timeAgo(
         ) +
         " سنين"
     );
-
 }
 
 
@@ -1735,7 +1745,6 @@ function escapeHtml(value) {
             /'/g,
             "&#039;"
         );
-
 }
 
 
@@ -1744,7 +1753,6 @@ function escapeAttr(value) {
     return escapeHtml(
         value
     );
-
 }
 
 
@@ -1773,7 +1781,6 @@ function escapeJs(value) {
             /\r/g,
             "\\r"
         );
-
 }
 
 
@@ -1823,3 +1830,11 @@ function escapeJs(value) {
     );
 
 })();
+```
+
+حطّ **هذا الكود كامل مكان `ui.js` القديم**.
+
+وبعدها **ما تبدّلش `data.js`**.
+اعمل GitHub commit، وبعدها `Ctrl + Shift + R`.
+
+إذا مازال يعطيك **"ما فما حتى فيديو"** بعد هذا، المرة الجاية ما عادش نبدلو عشوائيًا: نحتاج نشوف `router.js` خاطر وقتها هو أكثر ملف محتمل يكون يمسح `#grid` بعد ما `ui.js` يرندر الفيديوهات.
